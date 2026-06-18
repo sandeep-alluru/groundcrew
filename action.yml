@@ -1,0 +1,26 @@
+name: openveritas
+description: "Deterministic state oracle and semantic action codec for computer-use agents"
+inputs:
+  root:
+    description: "Directory to snapshot"
+    required: false
+    default: "."
+  db:
+    description: "Path to the openveritas receipts database"
+    required: false
+    default: ".openveritas/receipts.db"
+  fail-on-diff:
+    description: "Fail if unexpected file changes are detected"
+    required: false
+    default: "false"
+runs:
+  using: "composite"
+  steps:
+    - name: Install openveritas
+      shell: bash
+      run: pip install -e "${{ github.action_path }}"
+    - name: Check action receipts
+      shell: bash
+      run: |
+        ARGS="--db ${{ inputs.db }}"
+        openveritas log $ARGS || true

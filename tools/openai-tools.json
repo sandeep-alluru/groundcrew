@@ -1,0 +1,21 @@
+[
+  {
+    "type": "function",
+    "function": {
+      "name": "REPLACE_WITH_primary_operation",
+      "description": "REPLACE: one-sentence description of what this tool does and when to call it",
+      "strict": true,
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "input": {
+            "type": "string",
+            "description": "REPLACE: description of the primary input"
+          }
+        },
+        "required": ["input"],
+        "additionalProperties": false
+      }
+    }
+  }
+]
