@@ -1,11 +1,11 @@
-# GitHub Copilot Instructions — openveritas
+# GitHub Copilot Instructions — groundcrew
 
-openveritas: Deterministic state oracle and semantic action codec for computer-use agents
+groundcrew: Deterministic state oracle and semantic action codec for computer-use agents
 
 ## Module map
 
 ```
-src/openveritas/
+src/groundcrew/
 ├── # TODO: fill in after implementation
 ```
 
@@ -29,6 +29,6 @@ src/openveritas/
 
 ## Adding a new adapter / integration
 
-1. Create `src/openveritas/instrument_<framework>.py`
+1. Create `src/groundcrew/instrument_<framework>.py`
 2. Export from `__init__.py`, add to `__all__` alphabetically
 3. Add tests

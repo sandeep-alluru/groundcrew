@@ -1,4 +1,4 @@
-# openveritas demo — generate with: vhs assets/demo.tape
+# groundcrew demo — generate with: vhs assets/demo.tape
 # Install vhs: https://github.com/charmbracelet/vhs  (brew install vhs)
 
 Output assets/demo.gif
@@ -10,10 +10,10 @@ Set Padding 20
 Set PlaybackSpeed 1.0
 
 # Install
-Type "pip install openveritas" Sleep 500ms Enter
+Type "pip install groundcrew" Sleep 500ms Enter
 Sleep 2s
 Ctrl+L
 
 # TODO: replace below with real demo commands for this project
-Type "openveritas --help" Sleep 300ms Enter
+Type "groundcrew --help" Sleep 300ms Enter
 Sleep 3s

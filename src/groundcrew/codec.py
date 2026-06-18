@@ -6,7 +6,7 @@ import hashlib
 import json
 from dataclasses import dataclass, field
 
-from openveritas.snapshot import SnapshotDiff
+from groundcrew.snapshot import SnapshotDiff
 
 
 @dataclass

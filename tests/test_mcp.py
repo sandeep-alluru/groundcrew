@@ -1,10 +1,10 @@
-"""Tests for openveritas.mcp_server helper functions."""
+"""Tests for groundcrew.mcp_server helper functions."""
 
 from __future__ import annotations
 
 import json
 
-import openveritas.mcp_server as m
+import groundcrew.mcp_server as m
 
 
 def test_mcp_importable():
@@ -12,7 +12,7 @@ def test_mcp_importable():
 
 
 def test_capture_state_helper(tmp_path, monkeypatch):
-    monkeypatch.setenv("OPENVERITAS_DB", str(tmp_path / "r.db"))
+    monkeypatch.setenv("GROUNDCREW_DB", str(tmp_path / "r.db"))
     work = tmp_path / "work"
     work.mkdir()
     (work / "seed.txt").write_text("seed")
@@ -24,7 +24,7 @@ def test_capture_state_helper(tmp_path, monkeypatch):
 
 
 def test_capture_state_with_run_cmd(tmp_path, monkeypatch):
-    monkeypatch.setenv("OPENVERITAS_DB", str(tmp_path / "r.db"))
+    monkeypatch.setenv("GROUNDCREW_DB", str(tmp_path / "r.db"))
     work = tmp_path / "work"
     work.mkdir()
     args = json.dumps(
@@ -36,7 +36,7 @@ def test_capture_state_with_run_cmd(tmp_path, monkeypatch):
 
 
 def test_get_receipt_helper(tmp_path, monkeypatch):
-    monkeypatch.setenv("OPENVERITAS_DB", str(tmp_path / "r.db"))
+    monkeypatch.setenv("GROUNDCREW_DB", str(tmp_path / "r.db"))
     work = tmp_path / "work"
     work.mkdir()
     (work / "seed.txt").write_text("seed")
@@ -46,13 +46,13 @@ def test_get_receipt_helper(tmp_path, monkeypatch):
 
 
 def test_get_receipt_missing(tmp_path, monkeypatch):
-    monkeypatch.setenv("OPENVERITAS_DB", str(tmp_path / "r.db"))
+    monkeypatch.setenv("GROUNDCREW_DB", str(tmp_path / "r.db"))
     got = json.loads(m._get_receipt(json.dumps({"receipt_id": "nope"})))
     assert "error" in got
 
 
 def test_list_receipts_helper(tmp_path, monkeypatch):
-    monkeypatch.setenv("OPENVERITAS_DB", str(tmp_path / "r.db"))
+    monkeypatch.setenv("GROUNDCREW_DB", str(tmp_path / "r.db"))
     work = tmp_path / "work"
     work.mkdir()
     (work / "seed.txt").write_text("seed")
@@ -62,11 +62,11 @@ def test_list_receipts_helper(tmp_path, monkeypatch):
 
 
 def test_db_path_default(monkeypatch):
-    monkeypatch.delenv("OPENVERITAS_DB", raising=False)
-    assert m._db_path() == ".openveritas/receipts.db"
+    monkeypatch.delenv("GROUNDCREW_DB", raising=False)
+    assert m._db_path() == ".groundcrew/receipts.db"
 
 
 def test_db_path_env(tmp_path, monkeypatch):
     custom = str(tmp_path / "custom.db")
-    monkeypatch.setenv("OPENVERITAS_DB", custom)
+    monkeypatch.setenv("GROUNDCREW_DB", custom)
     assert m._db_path() == custom

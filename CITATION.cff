@@ -1,15 +1,15 @@
 cff-version: 1.2.0
 message: "If you use this software in academic work, please cite it as below."
 type: software
-title: "openveritas"
+title: "groundcrew"
 abstract: "Deterministic state oracle for computer-use agents"
 authors:
   - family-names: Alluru
     given-names: Sandeep
     email: salluru.work@gmail.com
     orcid: "https://orcid.org/0000-0000-0000-0000"
-repository-code: "https://github.com/sandeep-alluru/openveritas"
-url: "https://sandeep-alluru.github.io/openveritas"
+repository-code: "https://github.com/sandeep-alluru/groundcrew"
+url: "https://sandeep-alluru.github.io/groundcrew"
 license: MIT
 version: 0.1.0
 date-released: "2026-06-18"

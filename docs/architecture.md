@@ -1,11 +1,11 @@
 # Architecture
 
-openveritas is a pure-Python library. Deterministic state oracle and semantic action codec for computer-use agents
+groundcrew is a pure-Python library. Deterministic state oracle and semantic action codec for computer-use agents
 
 ## Module map
 
 ```
-src/openveritas/
+src/groundcrew/
 ├── # TODO: fill in
 ```
 

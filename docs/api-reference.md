@@ -3,14 +3,14 @@
 ## Top-level exports
 
 ```python
-import openveritas
+import groundcrew
 ```
 
 <!-- mkdocstrings will auto-generate from docstrings below -->
 
-::: openveritas
+::: groundcrew
 
 <!-- TODO: add per-module sections as you implement them:
-::: openveritas.core
-::: openveritas.cli
+::: groundcrew.core
+::: groundcrew.cli
 -->

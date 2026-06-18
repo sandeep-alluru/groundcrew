@@ -1,6 +1,6 @@
 # CLI Reference
 
-## `openveritas <command>`
+## `groundcrew <command>`
 
 TODO: document CLI commands and options
 

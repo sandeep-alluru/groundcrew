@@ -1,15 +1,15 @@
-# openveritas
+# groundcrew
 
 **Deterministic state oracle and semantic action codec for computer-use agents.**
 
-![openveritas](assets/hero.png)
+![groundcrew](assets/hero.png)
 
-[![CI](https://github.com/sandeep-alluru/openveritas/actions/workflows/ci.yml/badge.svg)](https://github.com/sandeep-alluru/openveritas/actions/workflows/ci.yml)
-[![PyPI version](https://img.shields.io/pypi/v/openveritas.svg)](https://pypi.org/project/openveritas/)
-[![Python 3.10+](https://img.shields.io/pypi/pyversions/openveritas.svg)](https://pypi.org/project/openveritas/)
-[![Downloads](https://img.shields.io/pypi/dm/openveritas.svg)](https://pypi.org/project/openveritas/)
+[![CI](https://github.com/sandeep-alluru/groundcrew/actions/workflows/ci.yml/badge.svg)](https://github.com/sandeep-alluru/groundcrew/actions/workflows/ci.yml)
+[![PyPI version](https://img.shields.io/pypi/v/groundcrew.svg)](https://pypi.org/project/groundcrew/)
+[![Python 3.10+](https://img.shields.io/pypi/pyversions/groundcrew.svg)](https://pypi.org/project/groundcrew/)
+[![Downloads](https://img.shields.io/pypi/dm/groundcrew.svg)](https://pypi.org/project/groundcrew/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![codecov](https://codecov.io/gh/sandeep-alluru/openveritas/branch/main/graph/badge.svg)](https://codecov.io/gh/sandeep-alluru/openveritas)
+[![codecov](https://codecov.io/gh/sandeep-alluru/groundcrew/branch/main/graph/badge.svg)](https://codecov.io/gh/sandeep-alluru/groundcrew)
 [![Typed](https://img.shields.io/badge/types-mypy-blue)](https://mypy-lang.org/)
 
 [Quick Start](#quick-start) · [How It Works](#how-it-works) · [CLI Reference](#cli-reference) · [GitHub Action](#github-action) · [vs. Alternatives](#vs-alternatives) · [Contributing](CONTRIBUTING.md)
@@ -22,11 +22,11 @@ Computer-use agents act on real software: they write files, call APIs, run scrip
 
 Screenshot-based LLM judges give you a visual approximation at best. They miss side effects — the extra file written, the config silently overwritten, the database row changed. And they cannot replay, diff, or audit what happened.
 
-openveritas inverts the architecture: instead of watching from the outside, it snapshots the filesystem **before and after every action** and produces a content-addressed **ActionReceipt** — a tamper-evident record of exactly what changed. No guessing. No LLM judge. Just a deterministic diff.
+groundcrew inverts the architecture: instead of watching from the outside, it snapshots the filesystem **before and after every action** and produces a content-addressed **ActionReceipt** — a tamper-evident record of exactly what changed. No guessing. No LLM judge. Just a deterministic diff.
 
 ```
-openveritas capture --root . --verb write --target config.json --run "agent.py"
-# → ActionReceipt: 3 files added, 1 modified, diff stored in .openveritas/receipts.db
+groundcrew capture --root . --verb write --target config.json --run "agent.py"
+# → ActionReceipt: 3 files added, 1 modified, diff stored in .groundcrew/receipts.db
 ```
 
 ---
@@ -77,13 +77,13 @@ Snapshots are computed by walking the directory tree with `os.walk`, hashing eac
 ## Quick Start
 
 ```bash
-pip install openveritas            # core library + CLI
-pip install "openveritas[api]"     # + FastAPI REST server
-pip install "openveritas[mcp]"     # + MCP server
+pip install groundcrew            # core library + CLI
+pip install "groundcrew[api]"     # + FastAPI REST server
+pip install "groundcrew[mcp]"     # + MCP server
 ```
 
 ```python
-from openveritas import Oracle, ActionSpec, ReceiptStore
+from groundcrew import Oracle, ActionSpec, ReceiptStore
 
 # Declare what you're about to do
 spec = ActionSpec(verb="write", target="config.json", params={"key": "value"})
@@ -98,7 +98,7 @@ print(receipt.diff.changed_paths)   # {'config.json'}
 print(receipt.id)                   # content-addressed ID
 
 # Persist for auditing
-store = ReceiptStore(".openveritas/receipts.db")
+store = ReceiptStore(".groundcrew/receipts.db")
 store.save(receipt)
 ```
 
@@ -107,7 +107,7 @@ store.save(receipt)
 ## CLI Reference
 
 ```bash
-openveritas [--db PATH] COMMAND [OPTIONS]
+groundcrew [--db PATH] COMMAND [OPTIONS]
 ```
 
 | Command | Description | Key options |
@@ -121,33 +121,33 @@ openveritas [--db PATH] COMMAND [OPTIONS]
 
 | Option | Default | Env var |
 |--------|---------|---------|
-| `--db PATH` | `.openveritas/receipts.db` | `OPENVERITAS_DB` |
+| `--db PATH` | `.groundcrew/receipts.db` | `GROUNDCREW_DB` |
 
 **Examples:**
 
 ```bash
 # Capture what an agent script does to the current directory
-openveritas capture --root . --verb run --target agent.py --run "python agent.py"
+groundcrew capture --root . --verb run --target agent.py --run "python agent.py"
 
 # Show what changed
-openveritas diff abc123de
+groundcrew diff abc123de
 
 # List all receipts
-openveritas log
+groundcrew log
 
 # Status
-openveritas status
+groundcrew status
 ```
 
 ---
 
 ## GitHub Action
 
-Add openveritas auditing to your CI pipeline:
+Add groundcrew auditing to your CI pipeline:
 
 ```yaml
-# .github/workflows/openveritas.yml
-name: openveritas audit
+# .github/workflows/groundcrew.yml
+name: groundcrew audit
 on: [push, pull_request]
 
 jobs:
@@ -155,17 +155,17 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: sandeep-alluru/openveritas@main
+      - uses: sandeep-alluru/groundcrew@main
         with:
           root: .
-          db: .openveritas/receipts.db
+          db: .groundcrew/receipts.db
 ```
 
 ---
 
 ## vs. Alternatives
 
-| | openveritas | Screenshot judges | AgentSight | OSWorld verifiers |
+| | groundcrew | Screenshot judges | AgentSight | OSWorld verifiers |
 |---|---|---|---|---|
 | **Verification method** | Filesystem diff | Vision LLM | eBPF syscall trace | Per-task custom code |
 | **Deterministic** | Yes — content-addressed | No — probabilistic | Partial | Yes (per app) |
@@ -176,40 +176,40 @@ jobs:
 | **Open source** | MIT | N/A | MIT | Research |
 | **Python package** | Yes | N/A | No | No |
 
-openveritas is not a replacement for security-layer tools like AgentSight. It is specifically designed for agent developers who need a simple, deterministic record of what their agent changed on disk — suitable for testing, auditing, and CI/CD gating.
+groundcrew is not a replacement for security-layer tools like AgentSight. It is specifically designed for agent developers who need a simple, deterministic record of what their agent changed on disk — suitable for testing, auditing, and CI/CD gating.
 
 ---
 
 ## Claude / MCP integration
 
-openveritas ships a Model Context Protocol server that lets Claude and other MCP-compatible agents record and query action receipts directly:
+groundcrew ships a Model Context Protocol server that lets Claude and other MCP-compatible agents record and query action receipts directly:
 
 ```bash
 # Start the MCP server
-python -m openveritas.mcp_server
+python -m groundcrew.mcp_server
 
 # In your Claude Code project's .claude/settings.json:
 {
   "mcpServers": {
-    "openveritas": {
+    "groundcrew": {
       "command": "python",
-      "args": ["-m", "openveritas.mcp_server"]
+      "args": ["-m", "groundcrew.mcp_server"]
     }
   }
 }
 ```
 
-Once connected, Claude can call `openveritas/capture_state`, `openveritas/get_receipt`, and `openveritas/list_receipts` as tools. See [docs/mcp.md](docs/mcp.md) for the full tool schema.
+Once connected, Claude can call `groundcrew/capture_state`, `groundcrew/get_receipt`, and `groundcrew/list_receipts` as tools. See [docs/mcp.md](docs/mcp.md) for the full tool schema.
 
 ---
 
 ## OpenAI integration
 
-openveritas exposes a FastAPI REST server compatible with OpenAI's function-calling format. The tool definitions are in [`tools/openai-tools.json`](tools/openai-tools.json) and the full API spec is in [`openapi.yaml`](openapi.yaml).
+groundcrew exposes a FastAPI REST server compatible with OpenAI's function-calling format. The tool definitions are in [`tools/openai-tools.json`](tools/openai-tools.json) and the full API spec is in [`openapi.yaml`](openapi.yaml).
 
 ```bash
 # Start the REST server
-uvicorn openveritas.api:app --reload
+uvicorn groundcrew.api:app --reload
 
 # Pass to Codex CLI or any OpenAI-compatible agent
 codex --tools tools/openai-tools.json "Capture what this script does to the filesystem"
@@ -222,9 +222,9 @@ Endpoints: `GET /health`, `POST /capture`, `GET /receipt/{id}`, `GET /receipts`,
 ## Repository structure
 
 ```
-openveritas/
+groundcrew/
 ├── src/
-│   └── openveritas/
+│   └── groundcrew/
 │       ├── snapshot.py       # FileState, StateSnapshot, SnapshotDiff
 │       ├── codec.py          # ActionSpec, ActionReceipt (content-addressed)
 │       ├── oracle.py         # Oracle context manager, capture(), ReceiptStore
@@ -264,4 +264,4 @@ Suggested topics for discoverability:
 
 ---
 
-[![Star History Chart](https://api.star-history.com/svg?repos=sandeep-alluru/openveritas&type=Date)](https://star-history.com/#sandeep-alluru/openveritas&Date)
+[![Star History Chart](https://api.star-history.com/svg?repos=sandeep-alluru/groundcrew&type=Date)](https://star-history.com/#sandeep-alluru/groundcrew&Date)

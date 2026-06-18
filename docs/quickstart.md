@@ -3,7 +3,7 @@
 ## Install
 
 ```bash
-pip install openveritas
+pip install groundcrew
 ```
 
 ## Step 1
@@ -17,7 +17,7 @@ TODO: second step
 ## Python API
 
 ```python
-import openveritas
+import groundcrew
 
 # TODO: add real API example
 ```

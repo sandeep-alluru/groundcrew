@@ -1,13 +1,13 @@
-"""MCP server for openveritas.
+"""MCP server for groundcrew.
 
-Start:  python -m openveritas.mcp_server
-Or:     openveritas-mcp
+Start:  python -m groundcrew.mcp_server
+Or:     groundcrew-mcp
 
 Add to Claude Desktop (~/.config/claude/claude_desktop_config.json):
     {
         "mcpServers": {
-            "openveritas": {
-                "command": "openveritas-mcp"
+            "groundcrew": {
+                "command": "groundcrew-mcp"
             }
         }
     }
@@ -22,14 +22,14 @@ import subprocess
 import sys
 from typing import Any
 
-from openveritas.codec import ActionSpec
-from openveritas.oracle import Oracle, ReceiptStore
+from groundcrew.codec import ActionSpec
+from groundcrew.oracle import Oracle, ReceiptStore
 
-_DEFAULT_DB = ".openveritas/receipts.db"
+_DEFAULT_DB = ".groundcrew/receipts.db"
 
 
 def _db_path() -> str:
-    return os.environ.get("OPENVERITAS_DB", _DEFAULT_DB)
+    return os.environ.get("GROUNDCREW_DB", _DEFAULT_DB)
 
 
 def _require_mcp() -> Any:
@@ -41,7 +41,7 @@ def _require_mcp() -> Any:
         return mcp, types, Server
     except ImportError:
         print(
-            "MCP server requires: pip install 'openveritas[mcp]'",
+            "MCP server requires: pip install 'groundcrew[mcp]'",
             file=sys.stderr,
         )
         sys.exit(1)
@@ -89,7 +89,7 @@ def run_server() -> None:
     """Start the MCP server on stdio."""
     mcp_mod, types, server_cls = _require_mcp()
 
-    server = server_cls("openveritas")
+    server = server_cls("groundcrew")
 
     @server.list_tools()
     async def list_tools() -> list[types.Tool]:

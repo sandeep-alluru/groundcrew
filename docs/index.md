@@ -1,4 +1,4 @@
-# openveritas
+# groundcrew
 
 **Deterministic state oracle and semantic action codec for computer-use agents**
 
@@ -10,14 +10,14 @@
 ## Install
 
 ```bash
-pip install openveritas
+pip install groundcrew
 ```
 
 ## Quick example
 
 ```bash
 # TODO: add real usage example
-openveritas --help
+groundcrew --help
 ```
 
 ## Why

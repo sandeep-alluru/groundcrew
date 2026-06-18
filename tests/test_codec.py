@@ -1,9 +1,9 @@
-"""Tests for openveritas.codec."""
+"""Tests for groundcrew.codec."""
 
 from __future__ import annotations
 
-from openveritas.codec import ActionReceipt, ActionSpec
-from openveritas.snapshot import SnapshotDiff
+from groundcrew.codec import ActionReceipt, ActionSpec
+from groundcrew.snapshot import SnapshotDiff
 
 
 def _diff():

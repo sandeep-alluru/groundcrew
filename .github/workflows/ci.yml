@@ -41,7 +41,7 @@ jobs:
         run: ruff format --check src/ tests/
 
       - name: Type check
-        run: mypy src/openveritas/ --ignore-missing-imports
+        run: mypy src/groundcrew/ --ignore-missing-imports
 
       - name: Test
         run: pytest tests/ -v --tb=short
@@ -68,13 +68,13 @@ jobs:
         with:
           path: ~/.cache/pip
           key: ${{ runner.os }}-pip-3.11-${{ hashFiles('pyproject.toml') }}
-      - name: Install openveritas
+      - name: Install groundcrew
         run: pip install -e .
       - name: Audit receipt store (if DB exists)
         run: |
-          if [ -f .openveritas/receipts.db ]; then
-            openveritas log
-            openveritas status
+          if [ -f .groundcrew/receipts.db ]; then
+            groundcrew log
+            groundcrew status
           else
             echo "No receipt store — skipping audit."
           fi

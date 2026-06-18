@@ -4,8 +4,8 @@ from __future__ import annotations
 
 import json
 
-from openveritas.codec import ActionReceipt
-from openveritas.snapshot import SnapshotDiff
+from groundcrew.codec import ActionReceipt
+from groundcrew.snapshot import SnapshotDiff
 
 
 def print_receipt(receipt: ActionReceipt, console=None) -> None:
@@ -56,7 +56,7 @@ def to_json(receipt: ActionReceipt | None, diff: SnapshotDiff | None = None) -> 
 
 def to_markdown(receipts: list) -> str:
     """Render a list of receipts as a Markdown table."""
-    lines = ["# OpenVeritas Action Log", ""]
+    lines = ["# Groundcrew Action Log", ""]
     lines.append("| ID | Verb | Target | Success | Changes |")
     lines.append("|---|---|---|---|---|")
     for r in receipts:

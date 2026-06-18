@@ -1,4 +1,4 @@
-# openveritas — Agent Context
+# groundcrew — Agent Context
 
 This file describes the project architecture for AI coding assistants (Claude Code, Cursor, Copilot).
 
@@ -9,7 +9,7 @@ Deterministic state oracle and semantic action codec for computer-use agents
 ## Module map
 
 ```
-src/openveritas/
+src/groundcrew/
 ├── # TODO: fill in module map
 ```
 

@@ -1,8 +1,8 @@
-site_name: openveritas
+site_name: groundcrew
 site_description: Deterministic state oracle and semantic action codec for computer-use agents
-site_url: https://sandeep-alluru.github.io/openveritas
-repo_url: https://github.com/sandeep-alluru/openveritas
-repo_name: sandeep-alluru/openveritas
+site_url: https://sandeep-alluru.github.io/groundcrew
+repo_url: https://github.com/sandeep-alluru/groundcrew
+repo_name: sandeep-alluru/groundcrew
 edit_uri: edit/main/docs/
 
 theme:
@@ -88,6 +88,6 @@ nav:
 extra:
   social:
     - icon: fontawesome/brands/github
-      link: https://github.com/sandeep-alluru/openveritas
+      link: https://github.com/sandeep-alluru/groundcrew
     - icon: fontawesome/brands/python
-      link: https://pypi.org/project/openveritas/
+      link: https://pypi.org/project/groundcrew/

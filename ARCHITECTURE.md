@@ -1,13 +1,13 @@
-# openveritas — Architecture
+# groundcrew — Architecture
 
 ## Overview
 
-openveritas is a deterministic state oracle and semantic action codec for computer-use agents. It captures filesystem state before and after agent actions, produces structured diffs, and stores tamper-evident action receipts.
+groundcrew is a deterministic state oracle and semantic action codec for computer-use agents. It captures filesystem state before and after agent actions, produces structured diffs, and stores tamper-evident action receipts.
 
 ## Module map
 
 ```
-src/openveritas/
+src/groundcrew/
 ├── snapshot.py       # FileState, StateSnapshot, SnapshotDiff, diff_snapshots()
 ├── codec.py          # ActionSpec, ActionReceipt
 ├── oracle.py         # Oracle context manager, capture(), ReceiptStore

@@ -1,7 +1,7 @@
-"""FastAPI REST wrapper for openveritas.
+"""FastAPI REST wrapper for groundcrew.
 
-Start:   uvicorn openveritas.api:app --reload
-Install: pip install "openveritas[api]"
+Start:   uvicorn groundcrew.api:app --reload
+Install: pip install "groundcrew[api]"
 Docs:    http://localhost:8000/docs
 """
 
@@ -16,26 +16,26 @@ try:
     from fastapi import FastAPI, HTTPException
     from pydantic import BaseModel, Field
 except ImportError as exc:
-    raise ImportError("API server requires: pip install 'openveritas[api]'") from exc
+    raise ImportError("API server requires: pip install 'groundcrew[api]'") from exc
 
-from openveritas import __version__
-from openveritas.codec import ActionSpec
-from openveritas.oracle import Oracle, ReceiptStore
+from groundcrew import __version__
+from groundcrew.codec import ActionSpec
+from groundcrew.oracle import Oracle, ReceiptStore
 
-_DEFAULT_DB = ".openveritas/receipts.db"
+_DEFAULT_DB = ".groundcrew/receipts.db"
 
 
 def _db_path() -> str:
-    return os.environ.get("OPENVERITAS_DB", _DEFAULT_DB)
+    return os.environ.get("GROUNDCREW_DB", _DEFAULT_DB)
 
 
 app = FastAPI(
-    title="openveritas API",
+    title="groundcrew API",
     description="Deterministic state oracle and semantic action codec for computer-use agents",
     version=__version__,
     license_info={
         "name": "MIT",
-        "url": "https://github.com/sandeep-alluru/openveritas/blob/main/LICENSE",
+        "url": "https://github.com/sandeep-alluru/groundcrew/blob/main/LICENSE",
     },
 )
 

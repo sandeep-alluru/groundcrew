@@ -1,4 +1,4 @@
-"""Subprocess-based CLI tests for openveritas."""
+"""Subprocess-based CLI tests for groundcrew."""
 
 from __future__ import annotations
 
@@ -8,7 +8,7 @@ import sys
 
 def test_cli_help():
     r = subprocess.run(
-        [sys.executable, "-m", "openveritas.cli", "--help"],
+        [sys.executable, "-m", "groundcrew.cli", "--help"],
         capture_output=True,
         text=True,
     )
@@ -19,7 +19,7 @@ def test_cli_help():
 def test_cli_log(tmp_path):
     db = str(tmp_path / "r.db")
     r = subprocess.run(
-        [sys.executable, "-m", "openveritas.cli", "--db", db, "log"],
+        [sys.executable, "-m", "groundcrew.cli", "--db", db, "log"],
         capture_output=True,
         text=True,
     )

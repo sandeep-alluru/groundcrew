@@ -1,4 +1,4 @@
-# Contributing to openveritas
+# Contributing to groundcrew
 
 Thank you for your interest in contributing. This guide covers everything you need to go from zero to a merged PR.
 
@@ -16,8 +16,8 @@ Thank you for your interest in contributing. This guide covers everything you ne
 ## Quick start
 
 ```bash
-git clone https://github.com/sandeep-alluru/openveritas
-cd openveritas
+git clone https://github.com/sandeep-alluru/groundcrew
+cd groundcrew
 python -m venv .venv && source .venv/bin/activate
 pip install -e ".[dev]"
 pre-commit install
@@ -37,14 +37,14 @@ Or individually:
 ```bash
 pytest tests/ -v
 ruff check src/ tests/
-mypy src/openveritas/
+mypy src/groundcrew/
 ```
 
 ## Adding a new snapshot target
 
-1. Create `src/openveritas/targets/{target_name}.py`
+1. Create `src/groundcrew/targets/{target_name}.py`
 2. Implement a class that inherits from `SnapshotTarget` and implements `capture() -> TargetSnapshot`
-3. Export the class from `src/openveritas/targets/__init__.py`
+3. Export the class from `src/groundcrew/targets/__init__.py`
 4. Add tests in `tests/test_{target_name}_target.py` covering capture, diff, and serialization
 5. Document the new target in the `## Snapshot targets` section of the README
 

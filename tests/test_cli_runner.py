@@ -1,16 +1,16 @@
-"""Click CliRunner tests for openveritas.cli (no subprocess)."""
+"""Click CliRunner tests for groundcrew.cli (no subprocess)."""
 
 from __future__ import annotations
 
 from click.testing import CliRunner
 
-from openveritas.cli import main
+from groundcrew.cli import main
 
 
 def test_help():
     result = CliRunner().invoke(main, ["--help"])
     assert result.exit_code == 0
-    assert "openveritas" in result.output.lower()
+    assert "groundcrew" in result.output.lower()
 
 
 def test_log_empty(tmp_path):

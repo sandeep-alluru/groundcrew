@@ -1,10 +1,10 @@
 # GitHub Action
 
-Use openveritas directly in your GitHub Actions workflow:
+Use groundcrew directly in your GitHub Actions workflow:
 
 ```yaml
-- name: openveritas
-  uses: sandeep-alluru/openveritas@v0.1.0
+- name: groundcrew
+  uses: sandeep-alluru/groundcrew@v0.1.0
   with:
     # TODO: add action inputs
     fail-on-error: "true"
@@ -13,9 +13,9 @@ Use openveritas directly in your GitHub Actions workflow:
 Or use the CLI directly:
 
 ```yaml
-- name: Install openveritas
-  run: pip install openveritas
+- name: Install groundcrew
+  run: pip install groundcrew
 
-- name: Run openveritas
-  run: openveritas --help
+- name: Run groundcrew
+  run: groundcrew --help
 ```

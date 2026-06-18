@@ -1,4 +1,4 @@
-"""openveritas demo — end-to-end walkthrough.
+"""groundcrew demo — end-to-end walkthrough.
 
 Run from repo root:
     python examples/demo.py
@@ -10,14 +10,14 @@ import json
 import tempfile
 from pathlib import Path
 
-from openveritas import ActionSpec, Oracle, ReceiptStore
-from openveritas.report import print_receipt, to_json, to_markdown
+from groundcrew import ActionSpec, Oracle, ReceiptStore
+from groundcrew.report import print_receipt, to_json, to_markdown
 
 
 def main() -> None:
     with tempfile.TemporaryDirectory() as tmp:
         root = Path(tmp)
-        db_path = root / ".openveritas" / "receipts.db"
+        db_path = root / ".groundcrew" / "receipts.db"
 
         # ── 1. Capture a "write" action ──────────────────────────────────────
         spec = ActionSpec(verb="write", target="config.json", params={"key": "value"})
@@ -63,7 +63,7 @@ def main() -> None:
 
         # ── 6. Markdown output ────────────────────────────────────────────────
         md = to_markdown([receipt, receipt2])
-        assert "OpenVeritas" in md or "openveritas" in md.lower()
+        assert "Groundcrew" in md or "groundcrew" in md.lower()
         print("\n── Markdown (first 3 lines) ──")
         print("\n".join(md.split("\n")[:3]))
 
@@ -74,7 +74,7 @@ def main() -> None:
 
         store.close()
 
-    print("\nopenveritas demo complete.")
+    print("\ngroundcrew demo complete.")
 
 
 if __name__ == "__main__":

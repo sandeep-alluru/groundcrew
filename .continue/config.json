@@ -1,5 +1,5 @@
 {
-  "name": "openveritas",
+  "name": "groundcrew",
   "version": "0.1.0",
   "schema": "v1",
   "context": [
@@ -8,7 +8,7 @@
   ],
   "docs": [
     {
-      "title": "openveritas Architecture",
+      "title": "groundcrew Architecture",
       "startUrl": "file://./ARCHITECTURE.md",
       "faviconUrl": ""
     }
@@ -16,12 +16,12 @@
   "customCommands": [
     {
       "name": "explain",
-      "prompt": "Explain how this part of openveritas works: {input}. Use the module map in AGENTS.md as context.",
+      "prompt": "Explain how this part of groundcrew works: {input}. Use the module map in AGENTS.md as context.",
       "description": "Explain a part of the codebase"
     }
   ],
   "rules": [
-    "This is openveritas — Deterministic state oracle and semantic action codec for computer-use agents.",
+    "This is groundcrew — Deterministic state oracle and semantic action codec for computer-use agents.",
     "Library code must not use print() — use rich.console.Console.",
     "All public API must have type annotations and docstrings.",
     "Tests use pytest. CLI tests use click.testing.CliRunner."

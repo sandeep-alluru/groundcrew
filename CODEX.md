@@ -1,4 +1,4 @@
-# openveritas — Codex Developer Guide
+# groundcrew — Codex Developer Guide
 
 > Read by OpenAI Codex CLI. Supplements AGENTS.md with Codex-specific conventions.
 
@@ -9,7 +9,7 @@ Deterministic state oracle and semantic action codec for computer-use agents
 ## Module map
 
 ```
-src/openveritas/
+src/groundcrew/
 ├── # TODO: fill in after implementation
 ```
 

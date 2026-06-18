@@ -1,17 +1,17 @@
 ---
-description: openveritas coding rules and architecture context
+description: groundcrew coding rules and architecture context
 globs: ["src/**/*.py", "tests/**/*.py"]
 alwaysApply: true
 ---
 
-# openveritas — Cursor Rules
+# groundcrew — Cursor Rules
 
 ## What this project does
 Deterministic state oracle and semantic action codec for computer-use agents
 
 ## Module map
 ```
-src/openveritas/
+src/groundcrew/
 ├── # TODO: fill in after implementation
 ```
 

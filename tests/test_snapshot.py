@@ -1,10 +1,10 @@
-"""Tests for openveritas.snapshot."""
+"""Tests for groundcrew.snapshot."""
 
 from __future__ import annotations
 
 from unittest import mock
 
-from openveritas.snapshot import (
+from groundcrew.snapshot import (
     FileState,
     StateSnapshot,
     diff_snapshots,
@@ -148,7 +148,7 @@ def test_diff_round_trip(tmp_path):
     diff = diff_snapshots(snap1, snap2)
     d = diff.to_dict()
     diff2 = diff_snapshots(snap1, snap2)
-    from openveritas.snapshot import SnapshotDiff
+    from groundcrew.snapshot import SnapshotDiff
 
     restored = SnapshotDiff.from_dict(d)
     assert restored.snapshot_b_id == diff2.snapshot_b_id

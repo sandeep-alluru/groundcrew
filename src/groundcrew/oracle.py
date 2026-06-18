@@ -8,8 +8,8 @@ import time
 from contextlib import contextmanager
 from pathlib import Path
 
-from openveritas.codec import ActionReceipt, ActionSpec
-from openveritas.snapshot import StateSnapshot, diff_snapshots
+from groundcrew.codec import ActionReceipt, ActionSpec
+from groundcrew.snapshot import StateSnapshot, diff_snapshots
 
 
 class Oracle:

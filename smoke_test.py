@@ -1,5 +1,5 @@
 """
-End-to-end smoke test for openveritas.
+End-to-end smoke test for groundcrew.
 
 Simulates a user who just installed the package and wants to verify everything works.
 No mocking, no fixtures — real behaviour, real CLI, real HTTP server.
@@ -71,14 +71,14 @@ section("1. Package import & public API")
 
 
 def _test_import_version():
-    import openveritas
+    import groundcrew
 
-    assert openveritas.__version__, "__version__ is empty"
-    assert openveritas.__version__ != "0.0.0"
+    assert groundcrew.__version__, "__version__ is empty"
+    assert groundcrew.__version__ != "0.0.0"
 
 
 def _test_public_api():
-    from openveritas import (
+    from groundcrew import (
         ActionReceipt,
         ActionSpec,
         FileState,
@@ -93,7 +93,7 @@ def _test_public_api():
     _ = (ActionReceipt, ActionSpec, FileState, ReceiptStore, SnapshotDiff)
 
 
-run("openveritas imports with a real version", _test_import_version)
+run("groundcrew imports with a real version", _test_import_version)
 run("Public API (Oracle, StateSnapshot, ActionSpec, ...) importable", _test_public_api)
 
 
@@ -103,7 +103,7 @@ section("2. Content-addressing & serialization")
 
 
 def _test_snapshot_content_addressed():
-    from openveritas import StateSnapshot
+    from groundcrew import StateSnapshot
 
     with tempfile.TemporaryDirectory() as tmp:
         root = Path(tmp)
@@ -118,7 +118,7 @@ def _test_snapshot_content_addressed():
 
 
 def _test_snapshot_round_trip():
-    from openveritas import StateSnapshot
+    from groundcrew import StateSnapshot
 
     with tempfile.TemporaryDirectory() as tmp:
         _seed(Path(tmp))
@@ -128,7 +128,7 @@ def _test_snapshot_round_trip():
 
 
 def _test_actionspec_content_addressed():
-    from openveritas import ActionSpec
+    from groundcrew import ActionSpec
 
     a = ActionSpec(verb="write", target="a.txt", params={"x": 1})
     b = ActionSpec(verb="write", target="a.txt", params={"x": 1})
@@ -139,7 +139,7 @@ def _test_actionspec_content_addressed():
 
 
 def _test_receipt_round_trip():
-    from openveritas import ActionReceipt, ActionSpec, SnapshotDiff
+    from groundcrew import ActionReceipt, ActionSpec, SnapshotDiff
 
     spec = ActionSpec(verb="write", target="a.txt", params={})
     diff = SnapshotDiff(snapshot_a_id="a", snapshot_b_id="b", added=[], removed=[], modified=[])
@@ -163,7 +163,7 @@ section("3. Oracle capture & ReceiptStore persistence")
 
 
 def _test_oracle_added():
-    from openveritas import ActionSpec, Oracle
+    from groundcrew import ActionSpec, Oracle
 
     with tempfile.TemporaryDirectory() as tmp:
         spec = ActionSpec(verb="write", target="new.txt", params={})
@@ -174,7 +174,7 @@ def _test_oracle_added():
 
 
 def _test_oracle_modified():
-    from openveritas import ActionSpec, Oracle
+    from groundcrew import ActionSpec, Oracle
 
     with tempfile.TemporaryDirectory() as tmp:
         _seed(Path(tmp))
@@ -186,7 +186,7 @@ def _test_oracle_modified():
 
 
 def _test_oracle_success_flag():
-    from openveritas import ActionSpec, Oracle
+    from groundcrew import ActionSpec, Oracle
 
     with tempfile.TemporaryDirectory() as tmp:
         spec = ActionSpec(verb="x", target="y", params={})
@@ -200,7 +200,7 @@ def _test_oracle_success_flag():
 
 
 def _test_store_round_trip():
-    from openveritas import ActionSpec, Oracle, ReceiptStore
+    from groundcrew import ActionSpec, Oracle, ReceiptStore
 
     with tempfile.TemporaryDirectory() as tmp:
         spec = ActionSpec(verb="write", target="new.txt", params={})
@@ -228,7 +228,7 @@ section("4. Report formatters")
 
 
 def _make_receipt():
-    from openveritas import ActionReceipt, ActionSpec, FileState, SnapshotDiff
+    from groundcrew import ActionReceipt, ActionSpec, FileState, SnapshotDiff
 
     spec = ActionSpec(verb="write", target="a.txt", params={})
     diff = SnapshotDiff(
@@ -244,7 +244,7 @@ def _make_receipt():
 
 
 def _test_to_json():
-    from openveritas.report import to_json
+    from groundcrew.report import to_json
 
     parsed = json.loads(to_json(_make_receipt()))
     assert parsed["spec"]["verb"] == "write"
@@ -252,11 +252,11 @@ def _test_to_json():
 
 
 def _test_to_markdown():
-    from openveritas.report import to_markdown
+    from groundcrew.report import to_markdown
 
     r = _make_receipt()
     md = to_markdown([r])
-    assert "OpenVeritas" in md
+    assert "Groundcrew" in md
     assert r.id in md
     assert "|" in md
 
@@ -266,7 +266,7 @@ def _test_print_receipt():
 
     from rich.console import Console
 
-    from openveritas.report import print_receipt
+    from groundcrew.report import print_receipt
 
     buf = io.StringIO()
     print_receipt(_make_receipt(), console=Console(file=buf, highlight=False))
@@ -280,12 +280,12 @@ run("print_receipt() outputs to console", _test_print_receipt)
 
 # ── 5. CLI ──────────────────────────────────────────────────────────────────────
 
-section("5. CLI (openveritas)")
+section("5. CLI (groundcrew)")
 
 
 def _test_cli_help():
     r = subprocess.run(
-        [PYTHON, "-m", "openveritas.cli", "--help"], capture_output=True, text=True
+        [PYTHON, "-m", "groundcrew.cli", "--help"], capture_output=True, text=True
     )
     assert r.returncode == 0
     assert len(r.stdout) > 20
@@ -298,7 +298,7 @@ def _test_cli_capture_and_log():
         work.mkdir()
         cap = subprocess.run(
             [
-                PYTHON, "-m", "openveritas.cli", "--db", db, "capture",
+                PYTHON, "-m", "groundcrew.cli", "--db", db, "capture",
                 "--root", str(work), "--verb", "create", "--target", "out.txt",
                 "--run", "echo hi > out.txt",
             ],
@@ -308,7 +308,7 @@ def _test_cli_capture_and_log():
         assert "Captured receipt" in cap.stdout
         assert (work / "out.txt").exists()
         log = subprocess.run(
-            [PYTHON, "-m", "openveritas.cli", "--db", db, "log"],
+            [PYTHON, "-m", "groundcrew.cli", "--db", db, "log"],
             capture_output=True, text=True,
         )
         assert log.returncode == 0
@@ -319,33 +319,33 @@ def _test_cli_status():
     with tempfile.TemporaryDirectory() as tmp:
         db = f"{tmp}/r.db"
         r = subprocess.run(
-            [PYTHON, "-m", "openveritas.cli", "--db", db, "status", "--root", tmp],
+            [PYTHON, "-m", "groundcrew.cli", "--db", db, "status", "--root", tmp],
             capture_output=True, text=True,
         )
         assert r.returncode == 0
         assert "Snapshot" in r.stdout
 
 
-run("openveritas --help returns 0", _test_cli_help)
-run("openveritas capture --run + log workflow", _test_cli_capture_and_log)
-run("openveritas status returns 0", _test_cli_status)
+run("groundcrew --help returns 0", _test_cli_help)
+run("groundcrew capture --run + log workflow", _test_cli_capture_and_log)
+run("groundcrew status returns 0", _test_cli_status)
 
 
 # ── 6. FastAPI server ───────────────────────────────────────────────────────────
 
-section("6. FastAPI server (openveritas[api])")
+section("6. FastAPI server (groundcrew[api])")
 
 
 def _test_api_import():
-    from openveritas.api import app
+    from groundcrew.api import app
 
-    assert app.title == "openveritas API"
+    assert app.title == "groundcrew API"
 
 
 def _test_api_health():
     from fastapi.testclient import TestClient
 
-    from openveritas.api import app
+    from groundcrew.api import app
 
     client = TestClient(app)
     r = client.get("/health")
@@ -359,8 +359,8 @@ def _test_api_capture_workflow():
     import os
 
     with tempfile.TemporaryDirectory() as tmp:
-        os.environ["OPENVERITAS_DB"] = f"{tmp}/r.db"
-        import openveritas.api as api_mod
+        os.environ["GROUNDCREW_DB"] = f"{tmp}/r.db"
+        import groundcrew.api as api_mod
 
         importlib.reload(api_mod)
         from fastapi.testclient import TestClient
@@ -382,21 +382,21 @@ def _test_api_capture_workflow():
         receipts = client.get("/receipts")
         assert receipts.status_code == 200
         assert len(receipts.json()["receipts"]) >= 1
-        del os.environ["OPENVERITAS_DB"]
+        del os.environ["GROUNDCREW_DB"]
 
 
-run("openveritas.api imports with correct title", _test_api_import)
+run("groundcrew.api imports with correct title", _test_api_import)
 run("GET /health returns {status: ok, version: ...}", _test_api_health)
 run("POST /capture + GET /receipt + /diff + /receipts workflow", _test_api_capture_workflow)
 
 
 # ── 7. MCP server ───────────────────────────────────────────────────────────────
 
-section("7. MCP server (openveritas[mcp])")
+section("7. MCP server (groundcrew[mcp])")
 
 
 def _test_mcp_importable():
-    import openveritas.mcp_server as m
+    import groundcrew.mcp_server as m
 
     assert hasattr(m, "run_server")
     assert callable(m._capture_state)
@@ -407,8 +407,8 @@ def _test_mcp_capture_tool():
     import os
 
     with tempfile.TemporaryDirectory() as tmp:
-        os.environ["OPENVERITAS_DB"] = f"{tmp}/r.db"
-        import openveritas.mcp_server as m
+        os.environ["GROUNDCREW_DB"] = f"{tmp}/r.db"
+        import groundcrew.mcp_server as m
 
         importlib.reload(m)
         work = Path(tmp) / "work"
@@ -421,7 +421,7 @@ def _test_mcp_capture_tool():
         assert got["id"] == out["id"]
         listed = json.loads(m._list_receipts("{}"))
         assert len(listed["receipts"]) >= 1
-        del os.environ["OPENVERITAS_DB"]
+        del os.environ["GROUNDCREW_DB"]
 
 
 run("mcp_server imports & exposes helpers", _test_mcp_importable)
@@ -434,8 +434,8 @@ section("8. Diff semantics (added / removed / modified)")
 
 
 def _test_diff_added_removed_modified():
-    from openveritas import StateSnapshot
-    from openveritas.snapshot import diff_snapshots
+    from groundcrew import StateSnapshot
+    from groundcrew.snapshot import diff_snapshots
 
     with tempfile.TemporaryDirectory() as tmp:
         root = Path(tmp)
@@ -455,8 +455,8 @@ def _test_diff_added_removed_modified():
 
 
 def _test_diff_none_baseline():
-    from openveritas import StateSnapshot
-    from openveritas.snapshot import diff_snapshots
+    from groundcrew import StateSnapshot
+    from groundcrew.snapshot import diff_snapshots
 
     with tempfile.TemporaryDirectory() as tmp:
         _seed(Path(tmp))
@@ -476,7 +476,7 @@ section("9. Edge cases")
 
 
 def _test_empty_dir():
-    from openveritas import StateSnapshot
+    from groundcrew import StateSnapshot
 
     with tempfile.TemporaryDirectory() as tmp:
         snap = StateSnapshot.capture(tmp)
@@ -485,7 +485,7 @@ def _test_empty_dir():
 
 
 def _test_nested_dirs():
-    from openveritas import StateSnapshot
+    from groundcrew import StateSnapshot
 
     with tempfile.TemporaryDirectory() as tmp:
         (Path(tmp) / "a" / "b").mkdir(parents=True)
@@ -495,7 +495,7 @@ def _test_nested_dirs():
 
 
 def _test_store_creates_parent_dirs():
-    from openveritas import ReceiptStore
+    from groundcrew import ReceiptStore
 
     with tempfile.TemporaryDirectory() as tmp:
         nested = Path(tmp) / "x" / "y" / "z" / "r.db"
@@ -505,7 +505,7 @@ def _test_store_creates_parent_dirs():
 
 
 def _test_empty_params_spec():
-    from openveritas import ActionSpec
+    from groundcrew import ActionSpec
 
     s = ActionSpec(verb="noop", target="", params={})
     assert len(s.id) == 16
@@ -523,7 +523,7 @@ section("10. Determinism guarantees")
 
 
 def _test_snapshot_id_independent_of_walk_order():
-    from openveritas import StateSnapshot
+    from groundcrew import StateSnapshot
 
     with tempfile.TemporaryDirectory() as tmp:
         root = Path(tmp)
@@ -535,7 +535,7 @@ def _test_snapshot_id_independent_of_walk_order():
 
 
 def _test_receipt_id_stable_across_serialization():
-    from openveritas import ActionReceipt
+    from groundcrew import ActionReceipt
 
     r = _make_receipt()
     r2 = ActionReceipt.from_dict(json.loads(json.dumps(r.to_dict())))
@@ -543,7 +543,7 @@ def _test_receipt_id_stable_across_serialization():
 
 
 def _test_spec_id_param_order_invariant():
-    from openveritas import ActionSpec
+    from groundcrew import ActionSpec
 
     a = ActionSpec(verb="v", target="t", params={"x": 1, "y": 2})
     b = ActionSpec(verb="v", target="t", params={"y": 2, "x": 1})
@@ -551,7 +551,7 @@ def _test_spec_id_param_order_invariant():
 
 
 def _test_unchanged_state_no_diff():
-    from openveritas import ActionSpec, Oracle
+    from groundcrew import ActionSpec, Oracle
 
     with tempfile.TemporaryDirectory() as tmp:
         _seed(Path(tmp))
@@ -564,8 +564,8 @@ def _test_unchanged_state_no_diff():
 
 
 def _test_capture_helper_context_manager():
-    from openveritas import ActionSpec
-    from openveritas.oracle import capture
+    from groundcrew import ActionSpec
+    from groundcrew.oracle import capture
 
     with tempfile.TemporaryDirectory() as tmp:
         spec = ActionSpec(verb="write", target="z.txt", params={})
@@ -596,7 +596,7 @@ if failed:
         print(f"    {YELLOW}-> {short}{RESET}")
     print(f"\n{YELLOW}Tip: run with --verbose for full tracebacks{RESET}")
 else:
-    print(f"{GREEN}All {total} checks passed — openveritas is ready to ship{RESET}")
+    print(f"{GREEN}All {total} checks passed — groundcrew is ready to ship{RESET}")
 
 print(f"{'=' * 60}\n")
 sys.exit(0 if not failed else 1)

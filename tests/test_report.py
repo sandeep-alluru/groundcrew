@@ -1,4 +1,4 @@
-"""Tests for openveritas.report."""
+"""Tests for groundcrew.report."""
 
 from __future__ import annotations
 
@@ -8,9 +8,9 @@ import json
 
 from rich.console import Console
 
-from openveritas.codec import ActionReceipt, ActionSpec
-from openveritas.report import print_diff, print_receipt, to_json, to_markdown
-from openveritas.snapshot import FileState, SnapshotDiff
+from groundcrew.codec import ActionReceipt, ActionSpec
+from groundcrew.report import print_diff, print_receipt, to_json, to_markdown
+from groundcrew.snapshot import FileState, SnapshotDiff
 
 
 def _receipt():
@@ -52,7 +52,7 @@ def test_to_json_none():
 
 def test_to_markdown_empty():
     md = to_markdown([])
-    assert "OpenVeritas Action Log" in md
+    assert "Groundcrew Action Log" in md
     assert "| ID |" in md
 
 

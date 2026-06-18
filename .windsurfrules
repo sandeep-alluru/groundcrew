@@ -1,11 +1,11 @@
-# openveritas — Windsurf Rules
+# groundcrew — Windsurf Rules
 
 ## Project overview
 Deterministic state oracle and semantic action codec for computer-use agents
 
 ## Module map
 ```
-src/openveritas/
+src/groundcrew/
 ├── # TODO: fill in after implementation
 ```
 

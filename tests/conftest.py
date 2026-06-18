@@ -1,1 +1,1 @@
-"""Shared pytest fixtures for openveritas tests."""
+"""Shared pytest fixtures for groundcrew tests."""

@@ -1,4 +1,4 @@
-name: openveritas
+name: groundcrew
 description: "Deterministic state oracle and semantic action codec for computer-use agents"
 inputs:
   root:
@@ -6,9 +6,9 @@ inputs:
     required: false
     default: "."
   db:
-    description: "Path to the openveritas receipts database"
+    description: "Path to the groundcrew receipts database"
     required: false
-    default: ".openveritas/receipts.db"
+    default: ".groundcrew/receipts.db"
   fail-on-diff:
     description: "Fail if unexpected file changes are detected"
     required: false
@@ -16,11 +16,11 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - name: Install openveritas
+    - name: Install groundcrew
       shell: bash
       run: pip install -e "${{ github.action_path }}"
     - name: Check action receipts
       shell: bash
       run: |
         ARGS="--db ${{ inputs.db }}"
-        openveritas log $ARGS || true
+        groundcrew log $ARGS || true

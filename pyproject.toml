@@ -3,7 +3,7 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "openveritas"
+name = "groundcrew"
 version = "0.1.0"
 description = "Deterministic state oracle and semantic action codec for computer-use agents"
 readme = "README.md"
@@ -44,15 +44,15 @@ mcp = ["mcp>=1.0"]
 api = ["fastapi>=0.110", "uvicorn>=0.29"]
 
 [project.scripts]
-openveritas = "openveritas.cli:main"
-openveritas-mcp = "openveritas.mcp_server:run_server"
+groundcrew = "groundcrew.cli:main"
+groundcrew-mcp = "groundcrew.mcp_server:run_server"
 
 [project.urls]
-Homepage      = "https://github.com/sandeep-alluru/openveritas"
-Repository    = "https://github.com/sandeep-alluru/openveritas"
-Documentation = "https://sandeep-alluru.github.io/openveritas"
-Changelog     = "https://github.com/sandeep-alluru/openveritas/blob/main/CHANGELOG.md"
-Issues        = "https://github.com/sandeep-alluru/openveritas/issues"
+Homepage      = "https://github.com/sandeep-alluru/groundcrew"
+Repository    = "https://github.com/sandeep-alluru/groundcrew"
+Documentation = "https://sandeep-alluru.github.io/groundcrew"
+Changelog     = "https://github.com/sandeep-alluru/groundcrew/blob/main/CHANGELOG.md"
+Issues        = "https://github.com/sandeep-alluru/groundcrew/issues"
 
 [tool.ruff]
 line-length    = 100
@@ -93,10 +93,10 @@ disallow_untyped_defs    = true
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-addopts   = "--cov=openveritas --cov-report=term-missing --cov-report=xml"
+addopts   = "--cov=groundcrew --cov-report=term-missing --cov-report=xml"
 
 [tool.coverage.run]
-source   = ["openveritas"]
+source   = ["groundcrew"]
 branch   = true
 omit     = ["*/tests/*", "*/examples/*"]
 

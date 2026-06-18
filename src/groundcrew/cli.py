@@ -1,4 +1,4 @@
-"""Command-line interface for openveritas."""
+"""Command-line interface for groundcrew."""
 
 from __future__ import annotations
 
@@ -6,27 +6,27 @@ import subprocess
 
 import click
 
-from openveritas.codec import ActionSpec
-from openveritas.oracle import Oracle, ReceiptStore
-from openveritas.report import print_diff, print_receipt, to_markdown
+from groundcrew.codec import ActionSpec
+from groundcrew.oracle import Oracle, ReceiptStore
+from groundcrew.report import print_diff, print_receipt, to_markdown
 
-_DEFAULT_DB = ".openveritas/receipts.db"
+_DEFAULT_DB = ".groundcrew/receipts.db"
 
 
 @click.group()
-@click.version_option(package_name="openveritas")
+@click.version_option(package_name="groundcrew")
 @click.option(
     "--db",
     default=_DEFAULT_DB,
     show_default=True,
-    help="Path to the openveritas receipt store.",
-    envvar="OPENVERITAS_DB",
+    help="Path to the groundcrew receipt store.",
+    envvar="GROUNDCREW_DB",
 )
 @click.pass_context
 def main(ctx: click.Context, db: str) -> None:
     """Deterministic state oracle and semantic action codec for computer-use agents.
 
-    openveritas captures the filesystem state before and after an action,
+    groundcrew captures the filesystem state before and after an action,
     and emits a verifiable, content-addressed receipt of what changed.
     """
     ctx.ensure_object(dict)
@@ -44,7 +44,7 @@ def capture(ctx: click.Context, root: str, verb: str, target: str, run_cmd: str 
 
     \b
     Examples:
-      openveritas capture --root . --verb write --target out.txt --run "echo hi > out.txt"
+      groundcrew capture --root . --verb write --target out.txt --run "echo hi > out.txt"
     """
     spec = ActionSpec(verb=verb, target=target, params={"run": run_cmd} if run_cmd else {})
     with Oracle(root, spec) as oracle:
@@ -68,7 +68,7 @@ def diff(ctx: click.Context, receipt_id: str) -> None:
 
     \b
     Examples:
-      openveritas diff abc123def456
+      groundcrew diff abc123def456
     """
     store = ReceiptStore(ctx.obj["db"])
     receipt = store.get(receipt_id)
@@ -85,7 +85,7 @@ def log(ctx: click.Context) -> None:
 
     \b
     Examples:
-      openveritas log
+      groundcrew log
     """
     store = ReceiptStore(ctx.obj["db"])
     receipts = store.list_receipts()
@@ -98,7 +98,7 @@ def log(ctx: click.Context) -> None:
 @click.pass_context
 def status(ctx: click.Context, root: str) -> None:
     """Show the current staging state (a live snapshot of the root)."""
-    from openveritas.snapshot import StateSnapshot
+    from groundcrew.snapshot import StateSnapshot
 
     snap = StateSnapshot.capture(root)
     store = ReceiptStore(ctx.obj["db"])

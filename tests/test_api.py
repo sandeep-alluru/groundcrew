@@ -1,4 +1,4 @@
-"""FastAPI TestClient tests for openveritas.api."""
+"""FastAPI TestClient tests for groundcrew.api."""
 
 from __future__ import annotations
 
@@ -10,8 +10,8 @@ from fastapi.testclient import TestClient
 
 @pytest.fixture
 def client(tmp_path, monkeypatch):
-    monkeypatch.setenv("OPENVERITAS_DB", str(tmp_path / "r.db"))
-    import openveritas.api as api_mod
+    monkeypatch.setenv("GROUNDCREW_DB", str(tmp_path / "r.db"))
+    import groundcrew.api as api_mod
 
     importlib.reload(api_mod)
     return TestClient(api_mod.app), tmp_path

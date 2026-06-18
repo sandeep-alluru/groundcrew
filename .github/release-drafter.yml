@@ -55,4 +55,4 @@ template: |
 
   $CHANGES
 
-  **Full Changelog**: https://github.com/sandeep-alluru/openveritas/compare/$PREVIOUS_TAG...v$RESOLVED_VERSION
+  **Full Changelog**: https://github.com/sandeep-alluru/groundcrew/compare/$PREVIOUS_TAG...v$RESOLVED_VERSION

@@ -1,12 +1,12 @@
-"""Tests for openveritas.oracle."""
+"""Tests for groundcrew.oracle."""
 
 from __future__ import annotations
 
 import pytest
 
-from openveritas.codec import ActionReceipt, ActionSpec
-from openveritas.oracle import Oracle, ReceiptStore, capture
-from openveritas.snapshot import SnapshotDiff
+from groundcrew.codec import ActionReceipt, ActionSpec
+from groundcrew.oracle import Oracle, ReceiptStore, capture
+from groundcrew.snapshot import SnapshotDiff
 
 
 def _spec():

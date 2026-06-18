@@ -1,11 +1,11 @@
 # MCP / Claude Integration
 
-openveritas ships an MCP server that exposes its core operations as native Claude tools.
+groundcrew ships an MCP server that exposes its core operations as native Claude tools.
 
 ## Install
 
 ```bash
-pip install "openveritas[mcp]"
+pip install "groundcrew[mcp]"
 ```
 
 ## Add to Claude Desktop
@@ -16,8 +16,8 @@ Edit `~/.config/claude/claude_desktop_config.json` (Linux) or
 ```json
 {
   "mcpServers": {
-    "openveritas": {
-      "command": "openveritas-mcp"
+    "groundcrew": {
+      "command": "groundcrew-mcp"
     }
   }
 }
@@ -35,4 +35,4 @@ After cloning the repo, these project-level commands are available:
 
 ## Smithery
 
-openveritas is listed on [smithery.ai](https://smithery.ai) — search for "openveritas" to install with one click.
+groundcrew is listed on [smithery.ai](https://smithery.ai) — search for "groundcrew" to install with one click.
