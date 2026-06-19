@@ -219,6 +219,15 @@ Endpoints: `GET /health`, `POST /capture`, `GET /receipt/{id}`, `GET /receipts`,
 
 ---
 
+## Case Studies
+
+See how teams are using groundcrew in production:
+
+- [Cryptographic Deployment Receipts for SOC2-Compliant AI Agents](docs/case-studies/enterprise-deployment-gate.md)
+- [Line-Level Audit Trails for AI-Modified Legal Contracts](docs/case-studies/legal-ai-document-auditing.md)
+
+---
+
 ## Repository structure
 
 ```
