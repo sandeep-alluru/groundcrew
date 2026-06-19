@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- `FileDiff`, `ContentDiff`, and `content_diff()` — line-level unified diff between two
+  snapshots by re-reading files from disk; binary file detection; aggregate line counts
+- `ChainVerification`, `verify_chain()`, and `build_chain_report()` — verify receipt chains
+  are unbroken (``after_id[n] == before_id[n+1]``); generate human-readable chain-of-custody
+  reports with verification result
+- `DirectoryWatcher` — poll a directory for unauthorized filesystem mutations; configurable
+  interval, authorized paths allowlist, and callback-based change notification
+- CLI command `groundcrew watch <dir>` with `--interval`, `--max-checks`, and `--allow` flags
+- Exports in `__init__.py`: `ChainVerification`, `ContentDiff`, `DirectoryWatcher`,
+  `FileDiff`, `build_chain_report`, `content_diff`, `verify_chain`
+
 ## [0.1.0] - 2026-06-17
 
 ### Added

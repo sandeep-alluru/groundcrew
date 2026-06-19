@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import subprocess
+from pathlib import Path
 
 import click
 
@@ -107,6 +108,63 @@ def status(ctx: click.Context, root: str) -> None:
     click.echo(f"Root      {snap.root}")
     click.echo(f"Snapshot  {snap.id}  ({len(snap.files)} files)")
     click.echo(f"Receipts  {count} stored")
+
+
+@main.command()
+@click.argument("directory", type=click.Path(exists=True, file_okay=False, path_type=Path))
+@click.option(
+    "--interval",
+    type=float,
+    default=5.0,
+    show_default=True,
+    help="Polling interval in seconds.",
+)
+@click.option(
+    "--max-checks",
+    type=int,
+    default=10,
+    show_default=True,
+    help="Maximum number of polling iterations before exiting.",
+)
+@click.option(
+    "--allow",
+    "allowed",
+    multiple=True,
+    metavar="PATH",
+    help="Relative path that is authorized to change. Repeat for multiple.",
+)
+def watch(directory: Path, interval: float, max_checks: int, allowed: tuple[str, ...]) -> None:
+    """Watch a directory for unauthorized changes.
+
+    Polls DIRECTORY every INTERVAL seconds. Reports any unexpected mutations
+    to stdout. Exits after MAX_CHECKS iterations.
+
+    \b
+    Examples:
+      groundcrew watch ./output --interval 2
+      groundcrew watch . --allow build/output.txt --max-checks 5
+    """
+    from groundcrew.watcher import DirectoryWatcher
+
+    watcher = DirectoryWatcher(
+        root=directory,
+        authorized_paths=list(allowed) if allowed else None,
+        interval_seconds=interval,
+    )
+    baseline = watcher.take_baseline()
+    click.echo(
+        f"Watching  {directory}  snapshot={baseline.id}  "
+        f"files={len(baseline.files)}  "
+        f"interval={interval}s  max_checks={max_checks}"
+    )
+
+    def _on_change(changes: list[str]) -> None:
+        click.echo(f"\n[ALERT] {len(changes)} unauthorized change(s) detected:")
+        for ch in changes:
+            click.echo(f"  {ch}")
+
+    watcher.watch(callback=_on_change, max_checks=max_checks)
+    click.echo("Watch complete.")
 
 
 if __name__ == "__main__":
