@@ -4,8 +4,6 @@ from __future__ import annotations
 
 import time
 
-import pytest
-
 from groundcrew.chain import ChainVerification, build_chain_report, verify_chain
 from groundcrew.codec import ActionReceipt, ActionSpec
 from groundcrew.snapshot import SnapshotDiff

@@ -15,21 +15,27 @@ class FileDiff:
 
     Attributes:
         path: Relative path to the file.
-        before_lines: Number of lines in the before version (0 for new files).
+        before_lines: Number of lines in the before version (0 for new files,
+            ``None`` for modified files where before content is unavailable —
+            the before snapshot only stores hashes, not content).
         after_lines: Number of lines in the after version (0 for deleted files).
         added_lines: Number of lines added.
         removed_lines: Number of lines removed.
         unified_diff: Standard unified diff string.
         is_binary: True if the file was detected as binary.
+        is_approximate: True when the before content is unavailable (modified
+            files). In this case the diff shows all current lines as added
+            because the before state cannot be reconstructed from hashes alone.
     """
 
     path: str
-    before_lines: int
+    before_lines: int | None  # None for modified files (before content not available)
     after_lines: int
     added_lines: int
     removed_lines: int
     unified_diff: str
     is_binary: bool = False
+    is_approximate: bool = False  # True when before content unavailable
 
 
 @dataclass
@@ -87,14 +93,16 @@ def _make_file_diff(
         if is_bin:
             return FileDiff(
                 path=rel_path,
-                before_lines=0,
+                before_lines=None,
                 after_lines=0,
                 added_lines=0,
                 removed_lines=0,
                 unified_diff="(binary file)",
                 is_binary=True,
+                is_approximate=True,
             )
-        # We don't have the before content (only its hash), so emit a +/= diff
+        # We don't have the before content (only its hash), so emit a +/= diff.
+        # before_lines is None to signal "unknown"; is_approximate=True flags the limitation.
         added = len(after_lines)
         diff_text = "".join(
             difflib.unified_diff(
@@ -106,12 +114,13 @@ def _make_file_diff(
         )
         return FileDiff(
             path=rel_path,
-            before_lines=0,
+            before_lines=None,
             after_lines=len(after_lines),
             added_lines=added,
             removed_lines=0,
             unified_diff=diff_text,
             is_binary=False,
+            is_approximate=True,
         )
 
     if after_exists:
@@ -157,6 +166,14 @@ def content_diff(
 
     Files that are binary are flagged with ``FileDiff.is_binary = True`` and
     their ``unified_diff`` is ``"(binary file)"``.
+
+    .. note::
+        **Limitation for modified files**: Because :class:`~groundcrew.snapshot.StateSnapshot`
+        only stores file hashes (not content), the before-state content cannot be
+        reconstructed for modified files. The diff for a modified file therefore
+        shows all current lines as added (diffing empty baseline vs. current content).
+        For such entries ``FileDiff.before_lines`` is ``None`` and
+        ``FileDiff.is_approximate`` is ``True``.
 
     Args:
         before_snapshot: The baseline state snapshot.

@@ -26,7 +26,6 @@ from groundcrew.codec import ActionReceipt, ActionSpec
 from groundcrew.oracle import Oracle, ReceiptStore
 from groundcrew.snapshot import StateSnapshot
 
-
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
@@ -406,10 +405,10 @@ def main() -> int:
         for i, receipt in enumerate(receipts):
             agent = receipt.spec.params.get("agent_id", f"agent-{i}")
             arrow_width = 20
-            print(f"       │")
+            print("       │")
             print(f"       │  {receipt.spec.verb.upper()} — {agent}")
             print(f"       │  Receipt: {receipt.id}")
-            print(f"       ▼")
+            print("       ▼")
             n_changed = len(receipt.diff.changed_paths)
             label = "(final state)" if i == len(receipts) - 1 else ""
             print(f"  [{snap_ids[i+1]}]  ({n_changed} file(s) changed) {label}")
@@ -426,12 +425,12 @@ def main() -> int:
         for r in all_from_store:
             total_files_changed.update(r.diff.changed_paths)
 
-        print(f"  Pipeline: PlannerAgent → CoderAgent → ReviewerAgent")
+        print("  Pipeline: PlannerAgent → CoderAgent → ReviewerAgent")
         print(f"  Receipts issued:       {len(all_from_store)}")
         print(f"  Total files touched:   {len(total_files_changed)}")
         print(f"  Chain of custody:      {'INTACT' if chain_intact else 'BROKEN'}")
         print()
-        print(f"  Files in final delivery:")
+        print("  Files in final delivery:")
         for fpath in sorted(total_files_changed):
             print(f"    {fpath}")
         print()

@@ -15,18 +15,18 @@ from groundcrew.snapshot import StateSnapshot, diff_snapshots
 class Oracle:
     """Context manager that snapshots a root before and after a block of work."""
 
-    def __init__(self, root, spec=None):
+    def __init__(self, root: str | Path, spec: ActionSpec | None = None) -> None:
         self.root = Path(root)
         self.spec = spec
         self._before: StateSnapshot | None = None
         self._after: StateSnapshot | None = None
         self._success = True
 
-    def __enter__(self):
+    def __enter__(self) -> Oracle:
         self._before = StateSnapshot.capture(self.root)
         return self
 
-    def __exit__(self, exc_type, exc_val, exc_tb):
+    def __exit__(self, exc_type: object, exc_val: object, exc_tb: object) -> bool:
         self._after = StateSnapshot.capture(self.root)
         if exc_type is not None:
             self._success = False
@@ -48,23 +48,17 @@ class Oracle:
 
 
 @contextmanager
-def capture(root, spec):
+def capture(root: str | Path, spec: ActionSpec | None):  # type: ignore[misc]
     """Convenience context manager wrapping :class:`Oracle`."""
     oracle = Oracle(root, spec)
-    oracle.__enter__()
-    try:
+    with oracle:
         yield oracle
-    except Exception:
-        oracle._success = False
-        raise
-    finally:
-        oracle.__exit__(None, None, None)
 
 
 class ReceiptStore:
     """A SQLite-backed store for persisting and retrieving action receipts."""
 
-    def __init__(self, path):
+    def __init__(self, path: str | Path) -> None:
         self._path = Path(path)
         self._path.parent.mkdir(parents=True, exist_ok=True)
         self._conn = sqlite3.connect(str(self._path))

@@ -23,7 +23,6 @@ from groundcrew.codec import ActionSpec
 from groundcrew.oracle import Oracle, ReceiptStore
 from groundcrew.snapshot import StateSnapshot
 
-
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
@@ -373,7 +372,7 @@ def main() -> None:
         tampered_file = root / "src" / "auth" / "jwt_handler.py"
         original_hash = sha256_file(tampered_file)
 
-        print(f"  Simulating unauthorized modification of: src/auth/jwt_handler.py")
+        print("  Simulating unauthorized modification of: src/auth/jwt_handler.py")
         print(f"  Original hash: {original_hash}")
         print()
 
@@ -383,7 +382,7 @@ def main() -> None:
         tampered_file.write_text(original_content + backdoor)
         tampered_hash = sha256_file(tampered_file)
 
-        print(f"  File modified (backdoor injected).")
+        print("  File modified (backdoor injected).")
         print(f"  Tampered hash: {tampered_hash}")
         print()
 
@@ -411,10 +410,10 @@ def main() -> None:
             # Check the specific file
             cur_file_state = after_files.get("src/auth/jwt_handler.py")
             if cur_file_state:
-                print(f"  File: src/auth/jwt_handler.py")
+                print("  File: src/auth/jwt_handler.py")
                 print(f"    Receipt hash:  {original_hash}  (at time of write)")
                 print(f"    Current hash:  {cur_file_state.sha256[:16]}")
-                print(f"    MISMATCH — file was modified after receipt was issued")
+                print("    MISMATCH — file was modified after receipt was issued")
         else:
             print("  No tampering detected (snapshot IDs match).")
 

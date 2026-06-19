@@ -27,24 +27,17 @@ from groundcrew.oracle import Oracle, ReceiptStore
 
 _DEFAULT_DB = ".groundcrew/receipts.db"
 
+try:
+    import mcp.server.stdio as _mcp_stdio
+    import mcp.types as _mcp_types
+    from mcp.server import Server as _Server
+    _HAS_MCP = True
+except ImportError:
+    _HAS_MCP = False
+
 
 def _db_path() -> str:
     return os.environ.get("GROUNDCREW_DB", _DEFAULT_DB)
-
-
-def _require_mcp() -> Any:
-    try:
-        import mcp.server.stdio
-        import mcp.types as types
-        from mcp.server import Server
-
-        return mcp, types, Server
-    except ImportError:
-        print(
-            "MCP server requires: pip install 'groundcrew[mcp]'",
-            file=sys.stderr,
-        )
-        sys.exit(1)
 
 
 def _capture_state(arguments: str) -> str:
@@ -87,14 +80,19 @@ def _list_receipts(arguments: str) -> str:
 
 def run_server() -> None:
     """Start the MCP server on stdio."""
-    mcp_mod, types, server_cls = _require_mcp()
+    if not _HAS_MCP:
+        print(
+            "MCP server requires: pip install 'groundcrew[mcp]'",
+            file=sys.stderr,
+        )
+        sys.exit(1)
 
-    server = server_cls("groundcrew")
+    server = _Server("groundcrew")
 
     @server.list_tools()
-    async def list_tools() -> list[types.Tool]:
+    async def list_tools() -> list[_mcp_types.Tool]:
         return [
-            types.Tool(
+            _mcp_types.Tool(
                 name="capture_state",
                 description=(
                     "Capture before/after filesystem state around an action and "
@@ -107,7 +105,7 @@ def run_server() -> None:
                     "required": ["arguments"],
                 },
             ),
-            types.Tool(
+            _mcp_types.Tool(
                 name="get_receipt",
                 description=(
                     "Fetch a stored receipt by ID. Argument is a JSON string with key: receipt_id."
@@ -118,7 +116,7 @@ def run_server() -> None:
                     "required": ["arguments"],
                 },
             ),
-            types.Tool(
+            _mcp_types.Tool(
                 name="list_receipts",
                 description="List all stored receipts. Argument is an (ignored) JSON string.",
                 inputSchema={
@@ -129,7 +127,7 @@ def run_server() -> None:
         ]
 
     @server.call_tool()
-    async def call_tool(name: str, arguments: dict[str, Any]) -> list[types.TextContent]:
+    async def call_tool(name: str, arguments: dict[str, Any]) -> list[_mcp_types.TextContent]:
         raw = arguments.get("arguments", "{}")
         if name == "capture_state":
             result = _capture_state(raw)
@@ -139,12 +137,12 @@ def run_server() -> None:
             result = _list_receipts(raw)
         else:
             raise ValueError(f"Unknown tool: {name}")
-        return [types.TextContent(type="text", text=result)]
+        return [_mcp_types.TextContent(type="text", text=result)]
 
     import asyncio
 
     async def _main() -> None:
-        async with mcp_mod.server.stdio.stdio_server() as (read_stream, write_stream):
+        async with _mcp_stdio.stdio_server() as (read_stream, write_stream):
             await server.run(read_stream, write_stream, server.create_initialization_options())
 
     asyncio.run(_main())

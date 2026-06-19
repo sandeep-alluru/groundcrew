@@ -24,7 +24,6 @@ from pathlib import Path
 from groundcrew.codec import ActionSpec
 from groundcrew.oracle import Oracle, ReceiptStore
 
-
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------

@@ -6,7 +6,7 @@ from pathlib import Path
 
 import pytest
 
-from groundcrew.content_diff import ContentDiff, FileDiff, content_diff
+from groundcrew.content_diff import ContentDiff, content_diff
 from groundcrew.snapshot import StateSnapshot
 
 
