@@ -18,12 +18,12 @@ class FileState:
     size: int
     sha256: str  # full hex digest
 
-    def to_dict(self) -> dict:
+    def to_dict(self) -> dict[str, object]:
         return {"path": self.path, "size": self.size, "sha256": self.sha256}
 
     @classmethod
-    def from_dict(cls, d) -> FileState:
-        return cls(path=d["path"], size=d["size"], sha256=d["sha256"])
+    def from_dict(cls, d: dict[str, object]) -> FileState:
+        return cls(path=str(d["path"]), size=int(str(d["size"])), sha256=str(d["sha256"]))
 
 
 @dataclass
@@ -33,12 +33,12 @@ class StateSnapshot:
     id: str  # SHA-256[:16] of sorted file-state JSON
     timestamp: float
     root: str
-    files: dict  # path -> FileState
+    files: dict[str, FileState]
 
     @classmethod
-    def capture(cls, root) -> StateSnapshot:
+    def capture(cls, root: str | Path) -> StateSnapshot:
         root = Path(root)
-        files = {}
+        files: dict[str, FileState] = {}
         for dirpath, _, filenames in os.walk(root):
             for fname in filenames:
                 fpath = Path(dirpath) / fname
@@ -54,7 +54,7 @@ class StateSnapshot:
         snap_id = hashlib.sha256(payload.encode()).hexdigest()[:16]
         return cls(id=snap_id, timestamp=time.time(), root=str(root), files=files)
 
-    def to_dict(self) -> dict:
+    def to_dict(self) -> dict[str, object]:
         return {
             "id": self.id,
             "timestamp": self.timestamp,
@@ -63,9 +63,11 @@ class StateSnapshot:
         }
 
     @classmethod
-    def from_dict(cls, d) -> StateSnapshot:
-        files = {k: FileState.from_dict(v) for k, v in d["files"].items()}
-        return cls(id=d["id"], timestamp=d["timestamp"], root=d["root"], files=files)
+    def from_dict(cls, d: dict[str, object]) -> StateSnapshot:
+        raw_files = d.get("files", {})
+        assert isinstance(raw_files, dict)
+        files = {k: FileState.from_dict(v) for k, v in raw_files.items()}  # type: ignore[arg-type]
+        return cls(id=str(d["id"]), timestamp=float(str(d["timestamp"])), root=str(d["root"]), files=files)
 
 
 @dataclass
@@ -92,13 +94,13 @@ class SnapshotDiff:
 
     snapshot_a_id: str | None
     snapshot_b_id: str
-    added: list  # list[FileState]
-    removed: list  # list[FileState]
-    modified: list  # list[tuple[FileState, FileState]]
+    added: list[FileState]
+    removed: list[FileState]
+    modified: list[tuple[FileState, FileState]]
 
     @property
-    def changed_paths(self) -> set:
-        paths = set()
+    def changed_paths(self) -> set[str]:
+        paths: set[str] = set()
         for f in self.added:
             paths.add(f.path)
         for f in self.removed:
@@ -107,7 +109,7 @@ class SnapshotDiff:
             paths.add(before.path)
         return paths
 
-    def to_dict(self) -> dict:
+    def to_dict(self) -> dict[str, object]:
         return {
             "snapshot_a_id": self.snapshot_a_id,
             "snapshot_b_id": self.snapshot_b_id,
@@ -117,13 +119,19 @@ class SnapshotDiff:
         }
 
     @classmethod
-    def from_dict(cls, d) -> SnapshotDiff:
+    def from_dict(cls, d: dict[str, object]) -> SnapshotDiff:
+        added_raw = d.get("added", [])
+        removed_raw = d.get("removed", [])
+        modified_raw = d.get("modified", [])
+        assert isinstance(added_raw, list)
+        assert isinstance(removed_raw, list)
+        assert isinstance(modified_raw, list)
         return cls(
-            snapshot_a_id=d["snapshot_a_id"],
-            snapshot_b_id=d["snapshot_b_id"],
-            added=[FileState.from_dict(f) for f in d["added"]],
-            removed=[FileState.from_dict(f) for f in d["removed"]],
-            modified=[(FileState.from_dict(b), FileState.from_dict(a)) for b, a in d["modified"]],
+            snapshot_a_id=str(d["snapshot_a_id"]) if d.get("snapshot_a_id") else None,
+            snapshot_b_id=str(d["snapshot_b_id"]),
+            added=[FileState.from_dict(f) for f in added_raw],  # type: ignore[arg-type]
+            removed=[FileState.from_dict(f) for f in removed_raw],  # type: ignore[arg-type]
+            modified=[(FileState.from_dict(b), FileState.from_dict(a)) for b, a in modified_raw],  # type: ignore[misc]
         )
 
 

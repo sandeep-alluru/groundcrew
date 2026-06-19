@@ -26,11 +26,10 @@ class Oracle:
         self._before = StateSnapshot.capture(self.root)
         return self
 
-    def __exit__(self, exc_type: object, exc_val: object, exc_tb: object) -> bool:
+    def __exit__(self, exc_type: object, exc_val: object, exc_tb: object) -> None:
         self._after = StateSnapshot.capture(self.root)
         if exc_type is not None:
             self._success = False
-        return False
 
     def record(self, spec: ActionSpec) -> ActionReceipt:
         """Build an ActionReceipt for ``spec`` from the captured before/after state."""

@@ -127,12 +127,17 @@ def _make_file_diff(
         # Added
         after_lines, is_bin = _read_lines(abs_path)
         if is_bin:
-            return FileDiff(path=rel_path, before_lines=0, after_lines=0,
-                            added_lines=0, removed_lines=0,
-                            unified_diff="(binary file)", is_binary=True)
+            return FileDiff(
+                path=rel_path,
+                before_lines=0,
+                after_lines=0,
+                added_lines=0,
+                removed_lines=0,
+                unified_diff="(binary file)",
+                is_binary=True,
+            )
         diff_text = "".join(
-            difflib.unified_diff([], after_lines,
-                                 fromfile="/dev/null", tofile=f"b/{rel_path}")
+            difflib.unified_diff([], after_lines, fromfile="/dev/null", tofile=f"b/{rel_path}")
         )
         return FileDiff(
             path=rel_path,

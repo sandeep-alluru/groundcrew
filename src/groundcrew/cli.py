@@ -50,7 +50,7 @@ def capture(ctx: click.Context, root: str, verb: str, target: str, run_cmd: str 
     spec = ActionSpec(verb=verb, target=target, params={"run": run_cmd} if run_cmd else {})
     with Oracle(root, spec) as oracle:
         if run_cmd:
-            result = subprocess.run(run_cmd, shell=True, cwd=root)  # noqa: S602
+            result = subprocess.run(run_cmd, shell=True, cwd=root)  # noqa: S602  # nosec B602
             if result.returncode != 0:
                 oracle._success = False
     receipt = oracle.record(spec)

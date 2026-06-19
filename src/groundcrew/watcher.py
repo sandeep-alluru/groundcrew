@@ -78,10 +78,7 @@ class DirectoryWatcher:
 
         for before, after in diff.modified:
             if before.path not in self.authorized_paths:
-                changes.append(
-                    f"MODIFIED {before.path} "
-                    f"({before.size} → {after.size} bytes)"
-                )
+                changes.append(f"MODIFIED {before.path} ({before.size} → {after.size} bytes)")
 
         return changes
 
