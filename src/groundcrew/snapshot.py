@@ -70,7 +70,25 @@ class StateSnapshot:
 
 @dataclass
 class SnapshotDiff:
-    """The structural delta between two snapshots: added, removed, modified files."""
+    """The structural delta between two snapshots: added, removed, modified files.
+
+    Attributes:
+        added:    ``list[FileState]`` — files present in *b* but not in *a*.
+                  Each element is a :class:`FileState`; use ``.path`` to get the
+                  relative path string.  Example::
+
+                      for f in diff.added:
+                          print(f.path)   # e.g. "subdir/new_file.txt"
+
+        removed:  ``list[FileState]`` — files present in *a* but not in *b*.
+                  Same type as ``added``; iterate with ``.path``.
+
+        modified: ``list[tuple[FileState, FileState]]`` — files whose content
+                  changed.  Each element is ``(before, after)``::
+
+                      for before, after in diff.modified:
+                          print(before.path, before.sha256, "->", after.sha256)
+    """
 
     snapshot_a_id: str | None
     snapshot_b_id: str

@@ -47,7 +47,7 @@ flowchart LR
 
 - **FileState** — a content-addressed snapshot of a single file: path, size, SHA-256.
 - **StateSnapshot** — a content-addressed snapshot of a directory tree. ID = SHA-256[:16] of sorted file states.
-- **SnapshotDiff** — the structural delta between two snapshots: added, removed, modified files.
+- **SnapshotDiff** — the structural delta between two snapshots: added, removed, modified files. `.added` and `.removed` are `list[FileState]`; each element has a `.path` attribute (relative path string). `.modified` is `list[tuple[FileState, FileState]]` (before, after).
 - **ActionSpec** — a semantic, content-addressed action description: `(verb, target, params)`. ID = SHA-256[:16] of the spec. The same action on the same target always produces the same ID.
 - **ActionReceipt** — binds an ActionSpec to a before-snapshot ID, after-snapshot ID, and SnapshotDiff. Stored permanently as an audit trail.
 - **ReceiptStore** — SQLite-backed store. Save receipts, retrieve by ID, list history.
@@ -70,7 +70,7 @@ Snapshots are computed by walking the directory tree with `os.walk`, hashing eac
 | Markdown output | Ready-to-paste audit reports |
 | FastAPI REST server | `/capture`, `/receipt/{id}`, `/receipts`, `/diff/{id}` |
 | MCP server | Model Context Protocol integration for Claude and other agents |
-| 69 tests | Comprehensive test suite covering all layers |
+| 91 tests | Comprehensive test suite covering all layers |
 
 ---
 
@@ -83,23 +83,26 @@ pip install "groundcrew[mcp]"     # + MCP server
 ```
 
 ```python
+import json, pathlib, tempfile
 from groundcrew import Oracle, ActionSpec, ReceiptStore
 
-# Declare what you're about to do
-spec = ActionSpec(verb="write", target="config.json", params={"key": "value"})
+# Use a temporary directory so nothing is left behind in your cwd
+with tempfile.TemporaryDirectory() as tmpdir:
+    # Declare what you're about to do
+    spec = ActionSpec(verb="write", target="config.json", params={"key": "value"})
 
-# Capture before/after state around the action
-with Oracle(".", spec) as oracle:
-    import json, pathlib
-    pathlib.Path("config.json").write_text(json.dumps({"key": "value"}))
+    # Capture before/after state around the action
+    with Oracle(tmpdir, spec) as oracle:
+        pathlib.Path(tmpdir, "config.json").write_text(json.dumps({"key": "value"}))
 
-receipt = oracle.record(spec)
-print(receipt.diff.changed_paths)   # {'config.json'}
-print(receipt.id)                   # content-addressed ID
+    receipt = oracle.record(spec)
+    print(receipt.diff.changed_paths)   # {'config.json'}
+    print(receipt.id)                   # content-addressed ID
 
-# Persist for auditing
-store = ReceiptStore(".groundcrew/receipts.db")
-store.save(receipt)
+    # Persist for auditing (db lives inside the temp dir — cleaned up automatically)
+    store = ReceiptStore(f"{tmpdir}/.groundcrew/receipts.db")
+    store.save(receipt)
+    # tmpdir and all its contents are removed when the `with` block exits
 ```
 
 ---
@@ -116,6 +119,7 @@ groundcrew [--db PATH] COMMAND [OPTIONS]
 | `diff RECEIPT_ID` | Show the SnapshotDiff for a stored receipt | — |
 | `log` | List all stored receipts | — |
 | `status` | Show database info | — |
+| `watch DIRECTORY` | Watch a directory for unexpected changes | `--interval SECS`, `--max-checks N`, `--allow PATH` |
 
 **Global options:**
 
