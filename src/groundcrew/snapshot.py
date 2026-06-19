@@ -67,7 +67,9 @@ class StateSnapshot:
         raw_files = d.get("files", {})
         assert isinstance(raw_files, dict)
         files = {k: FileState.from_dict(v) for k, v in raw_files.items()}  # type: ignore[arg-type]
-        return cls(id=str(d["id"]), timestamp=float(str(d["timestamp"])), root=str(d["root"]), files=files)
+        return cls(
+            id=str(d["id"]), timestamp=float(str(d["timestamp"])), root=str(d["root"]), files=files
+        )
 
 
 @dataclass

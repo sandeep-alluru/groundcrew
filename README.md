@@ -190,14 +190,13 @@ groundcrew ships a Model Context Protocol server that lets Claude and other MCP-
 
 ```bash
 # Start the MCP server
-python -m groundcrew.mcp_server
+groundcrew-mcp
 
 # In your Claude Code project's .claude/settings.json:
 {
   "mcpServers": {
     "groundcrew": {
-      "command": "python",
-      "args": ["-m", "groundcrew.mcp_server"]
+      "command": "groundcrew-mcp"
     }
   }
 }
