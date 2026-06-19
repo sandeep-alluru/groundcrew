@@ -66,7 +66,7 @@ class StateSnapshot:
     def from_dict(cls, d: dict[str, object]) -> StateSnapshot:
         raw_files = d.get("files", {})
         assert isinstance(raw_files, dict)
-        files = {k: FileState.from_dict(v) for k, v in raw_files.items()}  # type: ignore[arg-type]
+        files = {k: FileState.from_dict(v) for k, v in raw_files.items()}
         return cls(
             id=str(d["id"]), timestamp=float(str(d["timestamp"])), root=str(d["root"]), files=files
         )
@@ -131,9 +131,9 @@ class SnapshotDiff:
         return cls(
             snapshot_a_id=str(d["snapshot_a_id"]) if d.get("snapshot_a_id") else None,
             snapshot_b_id=str(d["snapshot_b_id"]),
-            added=[FileState.from_dict(f) for f in added_raw],  # type: ignore[arg-type]
-            removed=[FileState.from_dict(f) for f in removed_raw],  # type: ignore[arg-type]
-            modified=[(FileState.from_dict(b), FileState.from_dict(a)) for b, a in modified_raw],  # type: ignore[misc]
+            added=[FileState.from_dict(f) for f in added_raw],
+            removed=[FileState.from_dict(f) for f in removed_raw],
+            modified=[(FileState.from_dict(b), FileState.from_dict(a)) for b, a in modified_raw],
         )
 
 

@@ -3,12 +3,13 @@
 from __future__ import annotations
 
 import json
+from typing import Any
 
 from groundcrew.codec import ActionReceipt
 from groundcrew.snapshot import SnapshotDiff
 
 
-def print_receipt(receipt: ActionReceipt, console=None) -> None:
+def print_receipt(receipt: ActionReceipt, console: Any = None) -> None:
     """Pretty-print a receipt to the console (falls back to plain text)."""
     try:
         from rich.console import Console
@@ -28,7 +29,7 @@ def print_receipt(receipt: ActionReceipt, console=None) -> None:
         print(f"Receipt {receipt.id}: {receipt.spec.verb} -> {receipt.spec.target}")
 
 
-def print_diff(diff: SnapshotDiff, console=None) -> None:
+def print_diff(diff: SnapshotDiff, console: Any = None) -> None:
     """Pretty-print a snapshot diff to the console (falls back to plain text)."""
     try:
         from rich.console import Console
@@ -54,7 +55,7 @@ def to_json(receipt: ActionReceipt | None, diff: SnapshotDiff | None = None) -> 
     return "{}"
 
 
-def to_markdown(receipts: list) -> str:
+def to_markdown(receipts: list[ActionReceipt]) -> str:
     """Render a list of receipts as a Markdown table."""
     lines = ["# Groundcrew Action Log", ""]
     lines.append("| ID | Verb | Target | Success | Changes |")

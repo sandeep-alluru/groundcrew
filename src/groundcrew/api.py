@@ -46,7 +46,7 @@ class CaptureRequest(BaseModel):
     root: str = Field(".", description="Directory to snapshot.")
     verb: str = Field(..., description="Semantic verb for the action.")
     target: str = Field(..., description="Target the action acts upon.")
-    params: dict = Field(default_factory=dict)
+    params: dict[str, Any] = Field(default_factory=dict)
     run_cmd: str | None = Field(None, description="Optional shell command to execute.")
 
 

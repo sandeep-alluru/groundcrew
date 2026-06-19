@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 import sqlite3
 import time
+from collections.abc import Generator
 from contextlib import contextmanager
 from pathlib import Path
 
@@ -47,7 +48,7 @@ class Oracle:
 
 
 @contextmanager
-def capture(root: str | Path, spec: ActionSpec | None):  # type: ignore[misc]
+def capture(root: str | Path, spec: ActionSpec | None) -> Generator[Oracle, None, None]:
     """Convenience context manager wrapping :class:`Oracle`."""
     oracle = Oracle(root, spec)
     with oracle:
@@ -77,7 +78,7 @@ class ReceiptStore:
             return None
         return ActionReceipt.from_dict(json.loads(row[0]))
 
-    def list_receipts(self) -> list:
+    def list_receipts(self) -> list[ActionReceipt]:
         rows = self._conn.execute("SELECT data FROM receipts").fetchall()
         return [ActionReceipt.from_dict(json.loads(r[0])) for r in rows]
 

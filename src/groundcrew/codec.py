@@ -5,6 +5,7 @@ from __future__ import annotations
 import hashlib
 import json
 from dataclasses import dataclass, field
+from typing import Any
 
 from groundcrew.snapshot import SnapshotDiff
 
@@ -15,14 +16,14 @@ class ActionSpec:
 
     verb: str
     target: str
-    params: dict
+    params: dict[str, Any]
     id: str = field(init=False)
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         payload = f"{self.verb}|{self.target}|{json.dumps(self.params, sort_keys=True)}"
         self.id = hashlib.sha256(payload.encode()).hexdigest()[:16]
 
-    def to_dict(self) -> dict:
+    def to_dict(self) -> dict[str, Any]:
         return {
             "id": self.id,
             "verb": self.verb,
@@ -31,7 +32,7 @@ class ActionSpec:
         }
 
     @classmethod
-    def from_dict(cls, d) -> ActionSpec:
+    def from_dict(cls, d: dict[str, Any]) -> ActionSpec:
         return cls(verb=d["verb"], target=d["target"], params=d["params"])
 
 
@@ -47,7 +48,7 @@ class ActionReceipt:
     timestamp: float
     id: str = field(init=False)
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         payload = json.dumps(
             {
                 "spec_id": self.spec.id,
@@ -60,7 +61,7 @@ class ActionReceipt:
         )
         self.id = hashlib.sha256(payload.encode()).hexdigest()[:16]
 
-    def to_dict(self) -> dict:
+    def to_dict(self) -> dict[str, Any]:
         return {
             "id": self.id,
             "spec": self.spec.to_dict(),
@@ -72,7 +73,7 @@ class ActionReceipt:
         }
 
     @classmethod
-    def from_dict(cls, d) -> ActionReceipt:
+    def from_dict(cls, d: dict[str, Any]) -> ActionReceipt:
         spec = ActionSpec.from_dict(d["spec"])
         diff = SnapshotDiff.from_dict(d["diff"])
         return cls(
