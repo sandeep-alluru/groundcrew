@@ -244,8 +244,10 @@ def phase_groundcrew(portal_root: Path, db_path: Path) -> list:
     for line in report.split("\n"):
         print(f"  {line}")
 
-    store.close()
-    return receipts
+    try:
+        return receipts
+    finally:
+        store.close()
 
 
 # ── Phase 3: notarize — trace assembly, PII scrub, and verification ────────────
@@ -385,8 +387,10 @@ def phase_notarize(run_id: str, facts: list[UIFact], receipts: list) -> None:
     tampered_result = verifier.verify(tampered_trace)
     print(f"  Tampered trace verdict : {tampered_result.verdict}")
     print(f"  Failed checks          : {tampered_result.checks_failed}")
-    print("  Tamper was correctly detected: "
-          f"{'YES' if tampered_result.verdict == 'tampered' else 'NO'}")
+    assert tampered_result.verdict == "tampered", (
+        f"Expected verdict='tampered' after mutation, got '{tampered_result.verdict}'"
+    )
+    print("  Tamper was correctly detected: YES")
 
     # ── Final audit summary ───────────────────────────────────────────────────
     subsection("Audit Summary")
