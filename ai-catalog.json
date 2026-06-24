@@ -1,0 +1,40 @@
+{
+  "$schema": "https://agenticresourcediscovery.org/schema/v1/catalog.json",
+  "version": "1.0.0",
+  "name": "Groundcrew",
+  "description": "Deterministic state oracle and semantic action codec for computer-use agents",
+  "publisher": {
+    "name": "Sandeep Alluru",
+    "email": "onepuncchh@gmail.com",
+    "url": "https://github.com/sandeep-alluru"
+  },
+  "tools": [
+    {
+      "id": "io.github.sandeep-alluru/groundcrew",
+      "name": "groundcrew",
+      "title": "Groundcrew",
+      "description": "Deterministic state oracle and semantic action codec for computer-use agents",
+      "version": "0.1.2",
+      "protocol": "mcp",
+      "transport": "stdio",
+      "install": {
+        "pypi": {
+          "package": "groundcrew",
+          "extras": [
+            "mcp"
+          ],
+          "runtimeHint": "uvx"
+        }
+      },
+      "invocation": {
+        "command": "groundcrew-mcp"
+      },
+      "repository": {
+        "url": "https://github.com/sandeep-alluru/groundcrew",
+        "source": "github"
+      },
+      "homepage": "https://github.com/sandeep-alluru/groundcrew",
+      "license": "MIT"
+    }
+  ]
+}
