@@ -51,6 +51,7 @@ def _make_chain(n: int = 3) -> list[ActionReceipt]:
 
 # ── verify_chain ──────────────────────────────────────────────────────────────
 
+
 def test_verify_empty_chain() -> None:
     """Empty list is trivially valid."""
     result = verify_chain([])
@@ -97,6 +98,7 @@ def test_verify_chain_summary_contains_verdict() -> None:
 
 
 # ── build_chain_report ────────────────────────────────────────────────────────
+
 
 def test_build_chain_report_returns_string() -> None:
     """build_chain_report should return a non-empty string."""
