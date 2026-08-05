@@ -9,6 +9,7 @@ from groundcrew.closed_loop import (
     ClosedLoopError,
     GateOutcome,
     assert_side_effects,
+    dead_paths_for_receipt,
     gate_receipts,
 )
 from groundcrew.codec import ActionReceipt, ActionSpec
@@ -37,6 +38,7 @@ __all__ = [
     "assert_side_effects",
     "build_chain_report",
     "content_diff",
+    "dead_paths_for_receipt",
     "gate_receipts",
     "verify_chain",
 ]
