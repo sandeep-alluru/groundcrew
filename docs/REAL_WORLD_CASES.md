@@ -31,8 +31,56 @@ real Oracle write with disk verify.
 `verify_disk=True` with root). Without root, only the empty-effects check runs;
 phantom paths remain a known gap (documented in tests).
 
+## Case DB-WIPE — unattended destructive SQL/shell (Replit / AgentWard class)
+
+**Source:** Public incidents + Track B research (`20260806T201216Z`):
+
+| Incident | Link / note |
+|----------|-------------|
+| Replit AI deleted production DB | PUBLIC_FAILURE_CORPUS / HN class |
+| Google Antigravity wipe | unattended destructive filesystem |
+| HN: “An AI agent deleted our production database” | agent claimed success after wipe |
+| AgentWard | post-incident firewall after AI file delete |
+| Genesis Agent | self-destructive agent tools |
+
+**What fails:**
+
+1. Free-form SQL tools accept `DROP DATABASE` / `TRUNCATE` / `DELETE FROM` without
+   naming inventory (tables/DBs/paths) first.
+2. Production environment runs destructive verbs (`db_wipe`, `drop`, `rm -rf`)
+   without a human approval token.
+3. Success receipts are written after the wipe — filesystem `gate_receipts` alone
+   cannot see DB schema loss.
+
+**Product in this repo:**
+
+| Control | API |
+|---------|-----|
+| SQL classifier | `sql_is_destructive(sql)` |
+| Shell classifier | `shell_is_destructive(command)` |
+| Verb/tool classifier | `is_destructive(verb, sql=..., command=..., params=...)` |
+| Pre-exec gate | `gate_destructive(...)` — inventory + approval in prod |
+| Receipt gate | `gate_destructive_receipt(receipt, ...)` |
+| Raise form | `assert_not_destructive(...)` |
+| Verb set | `DESTRUCTIVE_VERBS` |
+
+**Rules (load-bearing):**
+
+- Destructive + empty inventory → **FAIL_LOUD** (`human_required`)
+- Destructive + strict env (`production`/`staging`/…) + no approval → **FAIL_LOUD**
+- Non-destructive (e.g. `SELECT`) → **PASS** without token
+- `dev`/`test` still require inventory for destructive ops; approval optional
+
+**Tests:** `tests/test_closed_loop_destructive.py` — Replit fixture, inventory miss,
+approval miss, authorised path, receipt path.
+
+**Non-Ornament:** Integrators **must** call `gate_destructive` (or
+`gate_destructive_receipt`) **before** executing SQL/shell tools. Pair with
+`humanproof.gate_approval` for token issue/consume. Without the pre-exec call,
+this library cannot stop the wipe.
+
 ## Related queue IDs
 
 - **SILENT-SUCCESS** — assemble/exit 0 degraded (shared with notarize)
-- Public: Replit DB wipe / Antigravity — approval + receipts for destructive ops
-  (humanproof + groundcrew; approval not yet shipped)
+- **DB-WIPE** — this case (Replit / Antigravity / AgentWard)
+- Public: pair with humanproof `gate_approval` for token lifecycle
