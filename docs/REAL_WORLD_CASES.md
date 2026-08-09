@@ -79,8 +79,45 @@ approval miss, authorised path, receipt path.
 `humanproof.gate_approval` for token issue/consume. Without the pre-exec call,
 this library cannot stop the wipe.
 
+---
+
+## Case TOOL-MISUSE — PRISMS validity / over-calling / missing (arXiv 2608.00218)
+
+**Source:** Track B research (`20260809T001229Z`) —
+[A Few Neurons Reveal When LLMs Misuse Tools](https://arxiv.org/abs/2608.00218)
+(PRISMS sparse detection of tool-use failures).
+
+**What fails:**
+
+1. **validity** — tool calls with missing/invalid arguments still execute.
+2. **over-calling** — unnecessary tools on answer-only turns / past max calls.
+3. **missing** — tools required by the task but none planned.
+
+**Product in this repo:**
+
+| Control | API |
+|---------|-----|
+| Schema / plan types | `ToolSchema`, `PlannedToolCall` |
+| Classifier | `analyze_tool_misuse` → `ToolMisuseReport` |
+| Validity helper | `call_is_valid` |
+| Gate | `gate_tool_misuse(...)` |
+| Raise form | `assert_tool_misuse_ok` |
+
+**Rules (load-bearing):**
+
+- Missing required tools / empty when `tools_required` → **FAIL_LOUD**
+- Invalid/incomplete arguments → **FAIL**
+- Over-calling (`tools_forbidden` or over `max_calls`) → **FAIL**
+- Clean plan → **PASS**
+
+**Tests:** `tests/test_tool_misuse.py`
+
+**Non-Ornament:** Call `gate_tool_misuse` on the tool plan **before** execution.
+Pair with `gate_destructive` for DROP/rm and `gate_receipts` after side effects.
+
 ## Related queue IDs
 
 - **SILENT-SUCCESS** — assemble/exit 0 degraded (shared with notarize)
 - **DB-WIPE** — this case (Replit / Antigravity / AgentWard)
+- **TOOL-MISUSE** — PRISMS class (this section)
 - Public: pair with humanproof `gate_approval` for token lifecycle
