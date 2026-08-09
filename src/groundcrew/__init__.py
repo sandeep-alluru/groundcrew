@@ -1,4 +1,4 @@
-"""groundcrew — Deterministic state oracle and semantic action codec for computer-use agents."""
+"""groundcrew - Deterministic state oracle and semantic action codec for computer-use agents."""
 
 from __future__ import annotations
 
@@ -37,12 +37,12 @@ from groundcrew.watcher import DirectoryWatcher
 __version__ = _version("groundcrew")
 
 __all__ = [
+    "DESTRUCTIVE_VERBS",
     "ActionReceipt",
     "ActionSpec",
     "ChainVerification",
     "ClosedLoopError",
     "ContentDiff",
-    "DESTRUCTIVE_VERBS",
     "DirectoryWatcher",
     "FileDiff",
     "FileState",

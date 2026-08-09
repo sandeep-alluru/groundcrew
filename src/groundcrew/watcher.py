@@ -1,4 +1,4 @@
-"""Directory watcher — poll a directory for unauthorized mutations."""
+"""Directory watcher - poll a directory for unauthorized mutations."""
 
 from __future__ import annotations
 

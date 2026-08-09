@@ -210,7 +210,8 @@ def _test_store_round_trip():
         store = ReceiptStore(Path(tmp) / "r.db")
         store.save(receipt)
         got = store.get(receipt.id)
-        assert got is not None and got.id == receipt.id
+        assert got is not None
+        assert got.id == receipt.id
         assert len(store.list_receipts()) == 1
         assert store.get("missing") is None
         store.close()

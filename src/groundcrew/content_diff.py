@@ -16,7 +16,7 @@ class FileDiff:
     Attributes:
         path: Relative path to the file.
         before_lines: Number of lines in the before version (0 for new files,
-            ``None`` for modified files where before content is unavailable —
+            ``None`` for modified files where before content is unavailable -
             the before snapshot only stores hashes, not content).
         after_lines: Number of lines in the after version (0 for deleted files).
         added_lines: Number of lines added.
@@ -83,11 +83,11 @@ def _make_file_diff(
     abs_path = root / rel_path
 
     if before_exists and after_exists:
-        # Modified — we re-read the current (after) version from disk.
+        # Modified - we re-read the current (after) version from disk.
         # For a true before/after we would need two root directories; since
         # StateSnapshot only stores hashes, we diff empty vs current for adds
         # and current vs empty for removes. For modifications we diff the
-        # before snapshot hash info (not content) — so we produce a unified
+        # before snapshot hash info (not content) - so we produce a unified
         # diff of the current file against an empty baseline to represent "changed".
         after_lines, is_bin = _read_lines(abs_path)
         if is_bin:
@@ -148,7 +148,7 @@ def _make_file_diff(
             unified_diff=diff_text,
         )
 
-    # Removed — file no longer on disk; we can only report it was removed
+    # Removed - file no longer on disk; we can only report it was removed
     return FileDiff(
         path=rel_path,
         before_lines=0,

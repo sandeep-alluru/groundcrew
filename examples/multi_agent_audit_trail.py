@@ -324,7 +324,6 @@ def main() -> int:
         print()
 
         receipts: list[ActionReceipt] = []
-        agent_names = ["PlannerAgent", "CoderAgent", "ReviewerAgent"]
 
         # -----------------------------------------------------------------------
         # Run agents sequentially
@@ -396,7 +395,6 @@ def main() -> int:
         # -----------------------------------------------------------------------
         section("Chain Visualization")
 
-        initial_snapshot = StateSnapshot.capture.__doc__  # just for reference
         snap_ids = [r.before_id[:8] for r in receipts] + [receipts[-1].after_id[:8]]
 
         print(f"  Initial state:     [{snap_ids[0]}]  (empty project)")
@@ -404,7 +402,6 @@ def main() -> int:
 
         for i, receipt in enumerate(receipts):
             agent = receipt.spec.params.get("agent_id", f"agent-{i}")
-            arrow_width = 20
             print("       │")
             print(f"       │  {receipt.spec.verb.upper()} — {agent}")
             print(f"       │  Receipt: {receipt.id}")

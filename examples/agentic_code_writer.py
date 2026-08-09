@@ -308,7 +308,7 @@ def main() -> None:
             step_num = step_info["step"]
             verb = step_info["verb"]
             target = step_info["target"]
-            description = step_info["description"]
+            step_info["description"]
             content = step_info["content"]
 
             spec = ActionSpec(
@@ -349,7 +349,7 @@ def main() -> None:
         print(f"  {'Step':<6} {'Action':<8} {'File':<40} {'Hash':<16} {'Status'}")
         print(f"  {'-'*4:<6} {'-'*6:<8} {'-'*38:<40} {'-'*14:<16} {'------'}")
 
-        for i, (step_info, receipt) in enumerate(zip(FILES_TO_WRITE, receipts)):
+        for i, (step_info, receipt) in enumerate(zip(FILES_TO_WRITE, receipts, strict=False)):
             verb = step_info["verb"]
             target = step_info["target"]
             file_hash = sha256_file(root / target)
@@ -405,7 +405,6 @@ def main() -> None:
             print()
             # Find which files changed
             after_files = current_snapshot.files
-            receipt_files = {}  # We don't have the after-snapshot stored, but we can check hashes
 
             # Check the specific file
             cur_file_state = after_files.get("src/auth/jwt_handler.py")

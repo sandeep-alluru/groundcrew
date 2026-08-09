@@ -1,4 +1,4 @@
-"""Tests for groundcrew.chain — verify_chain and build_chain_report."""
+"""Tests for groundcrew.chain - verify_chain and build_chain_report."""
 
 from __future__ import annotations
 

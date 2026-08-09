@@ -1,4 +1,4 @@
-"""Tests for groundcrew.content_diff — FileDiff, ContentDiff, content_diff."""
+"""Tests for groundcrew.content_diff - FileDiff, ContentDiff, content_diff."""
 
 from __future__ import annotations
 

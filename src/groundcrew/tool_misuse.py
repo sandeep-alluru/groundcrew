@@ -1,10 +1,10 @@
-"""TOOL-MISUSE — PRISMS-class tool-use failures (arXiv 2608.00218).
+"""TOOL-MISUSE - PRISMS-class tool-use failures (arXiv 2608.00218).
 
 Public case: Agentic LLMs exhibit three consequential tool-use failures:
 
-1. **validity** — invalid / incomplete arguments
-2. **over-calling** — unnecessary tool calls when none are needed
-3. **missing** — omitted calls when tools are required
+1. **validity** - invalid / incomplete arguments
+2. **over-calling** - unnecessary tool calls when none are needed
+3. **missing** - omitted calls when tools are required
 
 PRISMS detects these with sparse probes; this module is the **runtime gate**
 twin: refuse execution plans that exhibit the three classes before side effects.
@@ -16,8 +16,9 @@ Non-Ornament:
 
 from __future__ import annotations
 
+from collections.abc import Iterable, Mapping, Sequence
 from dataclasses import dataclass, field
-from typing import Any, Iterable, Literal, Mapping, Sequence
+from typing import Any, Literal
 
 from groundcrew.closed_loop import ClosedLoopError, GateOutcome
 
@@ -106,7 +107,7 @@ def _as_call(item: PlannedToolCall | dict[str, Any], index: int = 0) -> PlannedT
         return item
     if not isinstance(item, dict):
         raise TypeError(f"call must be PlannedToolCall or dict, got {type(item)!r}")
-    cid = str(item.get("call_id") or item.get("id") or f"call_{index+1}").strip()
+    cid = str(item.get("call_id") or item.get("id") or f"call_{index + 1}").strip()
     name = str(item.get("name") or item.get("tool") or "").strip()
     if not name:
         raise ValueError(f"tool call {cid!r} missing name")
@@ -138,7 +139,7 @@ def _type_ok(value: Any, expected: str) -> bool:
 def call_is_valid(call: PlannedToolCall, schema: ToolSchema | None) -> bool:
     """True when required args present and types match schema (if provided)."""
     if schema is None:
-        # no schema — only reject completely empty name
+        # no schema - only reject completely empty name
         return bool(call.name)
     args = call.arguments or {}
     for key in schema.required_args:
@@ -148,16 +149,22 @@ def call_is_valid(call: PlannedToolCall, schema: ToolSchema | None) -> bool:
         if expected and not _type_ok(args[key], expected):
             return False
     for key, expected in schema.arg_types.items():
-        if key in args and args[key] is not None and args[key] != "":
-            if not _type_ok(args[key], expected):
-                return False
+        if (
+            key in args
+            and args[key] is not None
+            and args[key] != ""
+            and not _type_ok(args[key], expected)
+        ):
+            return False
     return True
 
 
 def analyze_tool_misuse(
     calls: Sequence[PlannedToolCall | dict[str, Any]] | None,
     *,
-    schemas: Sequence[ToolSchema | dict[str, Any]] | Mapping[str, ToolSchema | dict[str, Any]] | None = None,
+    schemas: (
+        Sequence[ToolSchema | dict[str, Any]] | Mapping[str, ToolSchema | dict[str, Any]] | None
+    ) = None,
     tools_required: bool = False,
     required_tools: Iterable[str] | None = None,
     tools_forbidden: bool = False,
@@ -242,7 +249,9 @@ def analyze_tool_misuse(
 def gate_tool_misuse(
     calls: Sequence[PlannedToolCall | dict[str, Any]] | None = None,
     *,
-    schemas: Sequence[ToolSchema | dict[str, Any]] | Mapping[str, ToolSchema | dict[str, Any]] | None = None,
+    schemas: (
+        Sequence[ToolSchema | dict[str, Any]] | Mapping[str, ToolSchema | dict[str, Any]] | None
+    ) = None,
     tools_required: bool = False,
     required_tools: Iterable[str] | None = None,
     tools_forbidden: bool = False,
@@ -258,7 +267,7 @@ def gate_tool_misuse(
     * Invalid args (validity) → **FAIL**
     * Over-calling when tools forbidden / over max_calls → **FAIL**
     * Missing required tools / empty when tools_required → **FAIL_LOUD**
-      (missing is pre-generation boundary class — empty inventory)
+      (missing is pre-generation boundary class - empty inventory)
     * Clean plan → **PASS**
     """
     try:
@@ -286,7 +295,7 @@ def gate_tool_misuse(
             reason=(
                 f"TOOL-MISUSE/missing: required tool call(s) omitted "
                 f"missing={list(report.missing_tools)[:8]} call_count={report.call_count} "
-                f"— refuse answer-only path when tools are needed "
+                f"- refuse answer-only path when tools are needed "
                 f"(arXiv 2608.00218 PRISMS missing class)"
             ),
             exit_code=2,
@@ -303,7 +312,7 @@ def gate_tool_misuse(
             reason=(
                 f"TOOL-MISUSE/validity: {len(report.validity_ids)} call(s) with "
                 f"invalid/incomplete arguments ids={list(report.validity_ids)[:8]} "
-                f"— refuse execution (PRISMS validity class)"
+                f"- refuse execution (PRISMS validity class)"
             ),
             exit_code=1,
             human_required=True,
@@ -320,7 +329,7 @@ def gate_tool_misuse(
             reason=(
                 f"TOOL-MISUSE/over_calling: {len(report.over_call_ids)} unnecessary "
                 f"call(s) ids={list(report.over_call_ids)[:8]} "
-                f"(tools_forbidden={tools_forbidden} max_calls={max_calls}) — "
+                f"(tools_forbidden={tools_forbidden} max_calls={max_calls}) - "
                 f"refuse surplus tool use (PRISMS over-calling class)"
             ),
             exit_code=1,
@@ -334,9 +343,7 @@ def gate_tool_misuse(
     return GateOutcome(
         ok=True,
         verdict="PASS",
-        reason=(
-            f"TOOL-MISUSE ok: calls={report.call_count} classes={list(report.classes)}"
-        ),
+        reason=(f"TOOL-MISUSE ok: calls={report.call_count} classes={list(report.classes)}"),
         exit_code=0,
         human_required=False,
         receipt_count=report.call_count,

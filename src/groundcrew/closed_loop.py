@@ -10,22 +10,24 @@ What outcome changes?
   Empty store, empty receipt list, or success with zero changed paths → FAIL_LOUD
   (exit 2). L10: success requires non-empty side effects.
   D-GCROOT: success with phantom / dead paths (claimed changes not on disk when
-  ``root`` is provided) → FAIL_LOUD — never treat a fabricated diff as work.
+  ``root`` is provided) → FAIL_LOUD - never treat a fabricated diff as work.
   DB-WIPE / Replit class: destructive verb/SQL/shell without inventory + approval
   → FAIL_LOUD (human_required). Never unattended DROP/TRUNCATE/DELETE/rm.
 
 When NOT to use:
-  Never treat a success flag alone as proof of work — gate on changed_paths and,
+  Never treat a success flag alone as proof of work - gate on changed_paths and,
   when a workspace root is known, verify those paths against the live tree.
   Never treat a free-form SQL tool as safe without :func:`gate_destructive`.
 """
 
 from __future__ import annotations
 
+import contextlib
 import re
+from collections.abc import Sequence
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Sequence
+from typing import Any
 
 from groundcrew.codec import ActionReceipt, ActionSpec
 from groundcrew.oracle import ReceiptStore
@@ -261,7 +263,7 @@ def gate_receipts(
         require_side_effects: If True (L10 default), any receipt with
             ``success=True`` and zero ``changed_paths`` is FAIL_LOUD.
         require_any_success: If True, a non-empty set of receipts where every
-            receipt has ``success=False`` is FAIL (not FAIL_LOUD — evidence of
+            receipt has ``success=False`` is FAIL (not FAIL_LOUD - evidence of
             attempted work that failed).
         root: Workspace directory for D-GCROOT dead-path verification. When set
             (or when ``verify_disk`` is True with a root), success receipts whose
@@ -270,7 +272,7 @@ def gate_receipts(
             is provided, False otherwise.
 
     Returns:
-        :class:`GateOutcome` — callers should ``sys.exit(outcome.exit_code)``.
+        :class:`GateOutcome` - callers should ``sys.exit(outcome.exit_code)``.
     """
     do_disk = verify_disk if verify_disk is not None else (root is not None)
     if do_disk and root is None:
@@ -292,14 +294,14 @@ def gate_receipts(
                 store = ReceiptStore(path)
                 owns = True
                 receipts = list(store.list_receipts())
-            except Exception as exc:  # noqa: BLE001
+            except Exception as exc:
                 return _fail_loud(f"open receipt store failed: {exc.__class__.__name__}: {exc}")
         else:
             receipts = list(source)
 
         if len(receipts) == 0:
             return _fail_loud(
-                "empty receipts — no load-bearing filesystem side effects to gate "
+                "empty receipts - no load-bearing filesystem side effects to gate "
                 "(write-only ornament / L10)"
             )
 
@@ -334,7 +336,7 @@ def gate_receipts(
 
         if empty_effect:
             return _fail_loud(
-                "L10: success with empty side effects — "
+                "L10: success with empty side effects - "
                 f"receipt_ids={list(empty_effect)} "
                 "(success requires non-empty changed_paths)",
                 receipt_count=len(receipts),
@@ -344,7 +346,7 @@ def gate_receipts(
 
         if dead_effect:
             return _fail_loud(
-                "D-GCROOT: success with dead/phantom paths — "
+                "D-GCROOT: success with dead/phantom paths - "
                 f"receipt_ids={list(dead_effect)} "
                 f"dead_paths={dead_path_samples[:10]} "
                 "(claimed side effects do not match workspace root)",
@@ -359,10 +361,7 @@ def gate_receipts(
             return GateOutcome(
                 ok=False,
                 verdict="FAIL",
-                reason=(
-                    f"all receipts failed action (count={len(receipts)} "
-                    f"failed_ids={failed})"
-                ),
+                reason=(f"all receipts failed action (count={len(receipts)} failed_ids={failed})"),
                 exit_code=1,
                 receipt_count=len(receipts),
                 total_changed_paths=total_changed,
@@ -382,8 +381,7 @@ def gate_receipts(
             verdict="PASS",
             reason=(
                 f"receipts ok: count={len(receipts)} success={success_count} "
-                f"changed_paths={total_changed}"
-                + (f" disk_verified={root}" if do_disk else "")
+                f"changed_paths={total_changed}" + (f" disk_verified={root}" if do_disk else "")
             ),
             exit_code=0,
             receipt_count=len(receipts),
@@ -392,10 +390,8 @@ def gate_receipts(
         )
     finally:
         if owns and store is not None:
-            try:
+            with contextlib.suppress(Exception):
                 store.close()
-            except Exception:  # noqa: BLE001
-                pass
 
 
 def assert_side_effects(
@@ -419,7 +415,7 @@ def sql_is_destructive(sql: str) -> bool:
 
     Public incidents (Replit AI production DB wipe, AgentWard file wipe) start
     with free-form SQL tools that accept any string. Classifiers must refuse
-    before execution — not after a success receipt is written.
+    before execution - not after a success receipt is written.
     """
     if not sql or not str(sql).strip():
         return False
@@ -469,7 +465,7 @@ def is_destructive(
     if cmd_blob and shell_is_destructive(str(cmd_blob)):
         return True
 
-    # Target alone is not enough (e.g. verb=read target=users) — only when
+    # Target alone is not enough (e.g. verb=read target=users) - only when
     # combined with destructive verb, already handled above.
     _ = target
     return False
@@ -495,9 +491,7 @@ def _has_approval(*, approved: bool, approval_token: str | None) -> bool:
         # Explicit approved=True without token is accepted only when caller
         # already verified a humanproof token out-of-band.
         return True
-    if approval_token and str(approval_token).strip():
-        return True
-    return False
+    return bool(approval_token and str(approval_token).strip())
 
 
 def gate_destructive(
@@ -517,10 +511,10 @@ def gate_destructive(
 
     Load-bearing controls (all required for destructive ops in strict envs):
 
-    1. **Classify** — verb / SQL / shell must be detected as destructive.
-    2. **Inventory** — named targets that will be destroyed (tables, paths, DBs).
+    1. **Classify** - verb / SQL / shell must be detected as destructive.
+    2. **Inventory** - named targets that will be destroyed (tables, paths, DBs).
        Empty inventory = agent does not know what it is wiping → FAIL_LOUD.
-    3. **Approval** — human token / approved flag. Missing → FAIL_LOUD
+    3. **Approval** - human token / approved flag. Missing → FAIL_LOUD
        (``human_required=True``).
 
     Non-destructive calls PASS without inventory or approval.
@@ -540,28 +534,26 @@ def gate_destructive(
             inventory even when approved.
 
     Returns:
-        :class:`GateOutcome` — callers must not execute the tool unless ``ok``.
+        :class:`GateOutcome` - callers must not execute the tool unless ``ok``.
     """
     v = _canonical_verb(verb)
     action = v or (f"sql:{sql[:40]}" if sql else (f"cmd:{command[:40]}" if command else ""))
     env = (environment or "production").strip().lower()
     strict = env in _STRICT_ENVIRONMENTS or env == ""
 
-    # Completely empty call — nothing to gate.
+    # Completely empty call - nothing to gate.
     if not v and not (sql and str(sql).strip()) and not (command and str(command).strip()):
         p = params or {}
         if not p.get("sql") and not p.get("query") and not p.get("command") and not p.get("shell"):
             return _fail_loud(
-                "DB-WIPE: empty tool call — no verb/sql/command to classify "
+                "DB-WIPE: empty tool call - no verb/sql/command to classify "
                 "(cannot gate a phantom destructive action)",
                 human_required=True,
                 risk="high_risk",
                 action=action or None,
             )
 
-    destructive = is_destructive(
-        verb, target=target, sql=sql, command=command, params=params
-    )
+    destructive = is_destructive(verb, target=target, sql=sql, command=command, params=params)
     inv = _inventory_list(inventory)
     # Implicit inventory from target only when inventory was omitted (None),
     # not when the caller explicitly passed an empty list (declared no targets).
@@ -583,7 +575,7 @@ def gate_destructive(
     # --- Destructive path ---
     if require_inventory and len(inv) == 0:
         return _fail_loud(
-            "DB-WIPE: destructive action without inventory — "
+            "DB-WIPE: destructive action without inventory - "
             f"action={action!r} env={env} "
             "(Replit/AgentWard class: agent must name tables/paths/DBs before wipe)",
             human_required=True,
@@ -596,7 +588,7 @@ def gate_destructive(
     has_auth = _has_approval(approved=approved, approval_token=approval_token)
     if needs_approval and not has_auth:
         return _fail_loud(
-            "DB-WIPE: destructive action without human approval — "
+            "DB-WIPE: destructive action without human approval - "
             f"action={action!r} env={env} inventory={inv[:10]} "
             "(public: Replit AI production DB deletion; Antigravity wipe; "
             "AgentWard post-incident). Call humanproof.gate_approval first.",

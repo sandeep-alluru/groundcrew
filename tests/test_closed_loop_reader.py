@@ -1,4 +1,4 @@
-"""Closed-loop reader — empty receipts and empty side effects fail loudly (L10)."""
+"""Closed-loop reader - empty receipts and empty side effects fail loudly (L10)."""
 
 from __future__ import annotations
 

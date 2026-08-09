@@ -1,4 +1,4 @@
-"""DB-WIPE / Replit-class destructive tool gate — inventory + approval required.
+"""DB-WIPE / Replit-class destructive tool gate - inventory + approval required.
 
 Public cases (Track B research):
   * Replit AI deleted production database (unattended DROP)
@@ -121,11 +121,11 @@ def test_replit_db_wipe_no_approval_fails_loud() -> None:
 
 
 def test_drop_table_without_inventory_fails_loud() -> None:
-    """Agent issues DROP without naming tables — inventory required."""
+    """Agent issues DROP without naming tables - inventory required."""
     out = gate_destructive(
         verb="execute_sql",
         sql="DROP TABLE users; DROP TABLE orders;",
-        inventory=[],  # explicit empty — agent refused to list targets
+        inventory=[],  # explicit empty - agent refused to list targets
         approved=True,
         approval_token="owner-tok",
         environment="production",

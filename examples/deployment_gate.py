@@ -284,7 +284,7 @@ def main() -> int:
         print(f"  {len(all_receipts)} deployment receipt(s) on record:\n")
         for r in all_receipts:
             paths = sorted(r.diff.changed_paths)
-            gate_ok, auth, unauth = check_deployment_gate(r.id, r.diff.changed_paths, AUTHORIZED_PREFIXES)
+            gate_ok, _auth, _unauth = check_deployment_gate(r.id, r.diff.changed_paths, AUTHORIZED_PREFIXES)
             result = "APPROVED" if gate_ok else "BLOCKED"
             print(f"  [{result}]  Receipt {r.id}  ({r.spec.verb} {r.spec.target})")
             for p in paths:

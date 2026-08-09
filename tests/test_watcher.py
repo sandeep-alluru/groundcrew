@@ -1,4 +1,4 @@
-"""Tests for groundcrew.watcher — DirectoryWatcher."""
+"""Tests for groundcrew.watcher - DirectoryWatcher."""
 
 from __future__ import annotations
 

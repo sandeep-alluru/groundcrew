@@ -1,4 +1,4 @@
-"""TOOL-MISUSE — PRISMS-class validity / over-calling / missing (arXiv 2608.00218)."""
+"""TOOL-MISUSE - PRISMS-class validity / over-calling / missing (arXiv 2608.00218)."""
 
 from __future__ import annotations
 
@@ -118,7 +118,8 @@ def test_arxiv_prisms_fixture() -> None:
         [{"id": "v1", "tool": "code_exec", "arguments": {"code": ""}}],
         schemas=schemas,
     )
-    assert bad.ok is False and bad.verdict == "FAIL"
+    assert bad.ok is False
+    assert bad.verdict == "FAIL"
 
     # over-calling: tools forbidden (pure reasoning turn)
     over = gate_tool_misuse(
@@ -126,7 +127,8 @@ def test_arxiv_prisms_fixture() -> None:
         schemas=schemas,
         tools_forbidden=True,
     )
-    assert over.ok is False and "over" in over.reason.lower()
+    assert over.ok is False
+    assert "over" in over.reason.lower()
 
     # missing: need search but none planned
     miss = gate_tool_misuse(
@@ -134,7 +136,8 @@ def test_arxiv_prisms_fixture() -> None:
         required_tools=["search"],
         schemas=schemas,
     )
-    assert miss.ok is False and miss.verdict == "FAIL_LOUD"
+    assert miss.ok is False
+    assert miss.verdict == "FAIL_LOUD"
 
     # clean
     ok = gate_tool_misuse(

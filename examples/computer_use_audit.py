@@ -32,20 +32,19 @@ import tempfile
 import time
 from pathlib import Path
 
-# groundcrew
-from groundcrew.chain import build_chain_report, verify_chain
-from groundcrew.codec import ActionSpec
-from groundcrew.oracle import Oracle, ReceiptStore
+# clickproof
+from clickproof.fact import FactObservation, UIFact
+from clickproof.store import FactStore
 
 # notarize
 from notarize.scrubber import PrivacyScrubber
 from notarize.trace import AgentTrace, TraceStep
 from notarize.verifier import ConsistencyVerifier
 
-# clickproof
-from clickproof.fact import FactObservation, UIFact
-from clickproof.store import FactStore
-
+# groundcrew
+from groundcrew.chain import build_chain_report, verify_chain
+from groundcrew.codec import ActionSpec
+from groundcrew.oracle import Oracle, ReceiptStore
 
 # ── Helpers ───────────────────────────────────────────────────────────────────
 

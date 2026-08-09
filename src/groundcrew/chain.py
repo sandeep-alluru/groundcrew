@@ -1,4 +1,4 @@
-"""Receipt chain verification — validate and report chain-of-custody integrity."""
+"""Receipt chain verification - validate and report chain-of-custody integrity."""
 
 from __future__ import annotations
 
