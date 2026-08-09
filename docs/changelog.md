@@ -1,3 +1,3 @@
 # Changelog
 
-See [CHANGELOG.md](../CHANGELOG.md) for the full release history.
+See [CHANGELOG.md](https://github.com/sandeep-alluru/groundcrew/blob/main/CHANGELOG.md) for the full release history.

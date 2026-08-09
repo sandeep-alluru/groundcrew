@@ -201,8 +201,8 @@ def analyze_tool_misuse(
                 schema_map[s.name] = s
                 schema_map[str(k)] = s
         else:
-            for s in schemas:
-                sc = _as_schema(s)
+            for item in schemas:
+                sc = _as_schema(item)
                 schema_map[sc.name] = sc
 
     validity: list[str] = []
