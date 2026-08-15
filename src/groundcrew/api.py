@@ -8,11 +8,9 @@ Docs:    http://localhost:8000/docs
 from __future__ import annotations
 
 import os
-from pathlib import Path
-
-import os
 import shlex
 import subprocess
+from pathlib import Path
 from typing import Any
 
 try:
