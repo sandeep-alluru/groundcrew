@@ -8,6 +8,9 @@ Docs:    http://localhost:8000/docs
 from __future__ import annotations
 
 import os
+from pathlib import Path
+
+import os
 import shlex
 import subprocess
 from typing import Any
@@ -63,13 +66,36 @@ async def health() -> dict[str, str]:
     return {"status": "ok", "version": __version__}
 
 
+def _safe_api_root(root: str) -> str:
+    """Confine API-supplied workspace root (CodeQL path-injection barrier)."""
+    import tempfile
+
+    cwd_root = os.path.realpath(os.getcwd())
+    tmp_root = os.path.realpath(tempfile.gettempdir())
+    raw = str(root)
+    if chr(0) in raw or ".." in Path(raw).parts:
+        raise HTTPException(status_code=400, detail="invalid root path")
+    if os.path.isabs(os.path.expanduser(raw)):
+        fullpath = os.path.realpath(os.path.normpath(os.path.expanduser(raw)))
+    else:
+        fullpath = os.path.realpath(os.path.normpath(os.path.join(cwd_root, raw)))
+    if not (
+        fullpath.startswith(cwd_root)
+        or fullpath.startswith(tmp_root + os.sep)
+        or fullpath == tmp_root
+    ):
+        raise HTTPException(status_code=400, detail="root outside workspace")
+    return fullpath
+
+
 @app.post("/capture")
 async def capture(request: CaptureRequest) -> Any:
     """Capture before/after state around an action and persist a receipt."""
+    safe_root = _safe_api_root(request.root)
     spec = ActionSpec(verb=request.verb, target=request.target, params=request.params)
-    with Oracle(request.root, spec) as oracle:
+    with Oracle(safe_root, spec) as oracle:
         if request.run_cmd:
-            result = subprocess.run(shlex.split(request.run_cmd), cwd=request.root, check=False)  # noqa: S603
+            result = subprocess.run(shlex.split(request.run_cmd), cwd=safe_root, check=False)  # noqa: S603
             if result.returncode != 0:
                 oracle._success = False
     receipt = oracle.record(spec)

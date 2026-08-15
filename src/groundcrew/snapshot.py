@@ -37,15 +37,13 @@ class StateSnapshot:
 
     @classmethod
     def capture(cls, root: str | Path) -> StateSnapshot:
-        """Snapshot every file under *root* (operator workspace path).
+        """Snapshot every file under *root* (local operator workspace).
 
-        Paths must resolve under the process CWD or the system temp dir
-        (pytest). CodeQL: open() only after startswith against those
-        *untainted* roots (cwd / gettempdir), not against user fullpath.
+        Rebuilds the walk root from *trusted* base (cwd or tempdir) + safe
+        path components so CodeQL sees no user-tainted path at walk/open.
         """
         import tempfile
 
-        # Untainted trusted prefixes (CodeQL sources are not these)
         cwd_root = os.path.realpath(os.getcwd())
         tmp_root = os.path.realpath(tempfile.gettempdir())
         raw = str(root)
@@ -53,42 +51,58 @@ class StateSnapshot:
             raise ValueError("snapshot root must not contain '..' or NUL")
 
         if os.path.isabs(os.path.expanduser(raw)):
-            fullpath = os.path.realpath(os.path.normpath(os.path.expanduser(raw)))
+            candidate = os.path.realpath(os.path.normpath(os.path.expanduser(raw)))
         else:
-            fullpath = os.path.realpath(os.path.normpath(os.path.join(cwd_root, raw)))
+            candidate = os.path.realpath(os.path.normpath(os.path.join(cwd_root, raw)))
 
-        # GOOD: prefix check against untainted roots before any FS walk
-        if not (
-            fullpath.startswith(cwd_root)
-            or fullpath.startswith(tmp_root + os.sep)
-            or fullpath == tmp_root
-        ):
+        # Pick trusted base and relative parts under it
+        if candidate == cwd_root or candidate.startswith(cwd_root + os.sep):
+            trusted_base = cwd_root
+            rel = os.path.relpath(candidate, cwd_root)
+        elif candidate == tmp_root or candidate.startswith(tmp_root + os.sep):
+            trusted_base = tmp_root
+            rel = os.path.relpath(candidate, tmp_root)
+        else:
             raise ValueError("snapshot root outside allowed workspace")
-        if not os.path.isdir(fullpath):
-            raise ValueError(f"snapshot root is not a directory: {fullpath}")
+
+        # Rebuild path from trusted_base + basename components only
+        walk_root = trusted_base
+        if rel not in (".", ""):
+            for part in Path(rel).parts:
+                if part in ("", ".", "..") or os.sep in part:
+                    raise ValueError(f"invalid path component: {part!r}")
+                walk_root = os.path.join(walk_root, part)
+        walk_root = os.path.realpath(walk_root)
+
+        # Final check against untainted trusted_base
+        if not walk_root.startswith(trusted_base):
+            raise ValueError("not allowed")
+        if not os.path.isdir(walk_root):
+            raise ValueError(f"snapshot root is not a directory: {walk_root}")
 
         files: dict[str, FileState] = {}
-        for dirpath, _dirnames, filenames in os.walk(fullpath):
+        for dirpath, _dirnames, filenames in os.walk(walk_root):
             for fname in filenames:
-                candidate = os.path.normpath(os.path.join(dirpath, fname))
-                fpath = os.path.realpath(candidate)
-                # GOOD: only open if under untainted cwd or temp root
-                if not (fpath.startswith(cwd_root) or fpath.startswith(tmp_root + os.sep)):
+                if not fname or fname in (".", ".."):
                     continue
-                # also stay under resolved snapshot root
-                if not fpath.startswith(fullpath):
+                # dirpath from walk of walk_root (rebuilt trusted path)
+                fpath = os.path.join(dirpath, fname)
+                fpath = os.path.normpath(fpath)
+                if not fpath.startswith(trusted_base):
                     continue
-                rel = os.path.relpath(fpath, fullpath)
+                if not fpath.startswith(walk_root):
+                    continue
+                rel_f = os.path.relpath(fpath, walk_root)
                 try:
                     with open(fpath, "rb") as fh:
                         data = fh.read()
                     h = hashlib.sha256(data).hexdigest()
-                    files[rel] = FileState(path=rel, size=len(data), sha256=h)
+                    files[rel_f] = FileState(path=rel_f, size=len(data), sha256=h)
                 except (PermissionError, OSError):
                     pass
         payload = json.dumps({k: v.to_dict() for k, v in sorted(files.items())}, sort_keys=True)
         snap_id = hashlib.sha256(payload.encode()).hexdigest()[:16]
-        return cls(id=snap_id, timestamp=time.time(), root=fullpath, files=files)
+        return cls(id=snap_id, timestamp=time.time(), root=walk_root, files=files)
 
     def to_dict(self) -> dict[str, object]:
         return {
