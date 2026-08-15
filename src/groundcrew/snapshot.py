@@ -37,22 +37,26 @@ class StateSnapshot:
 
     @classmethod
     def capture(cls, root: str | Path) -> StateSnapshot:
-        root = Path(root)
+        # Confine walk to realpath(root) — CodeQL py/path-injection
+        root_real = os.path.realpath(os.path.expanduser(str(root)))
+        root_prefix = root_real if root_real.endswith(os.sep) else root_real + os.sep
         files: dict[str, FileState] = {}
-        for dirpath, _, filenames in os.walk(root):
+        for dirpath, _, filenames in os.walk(root_real):
             for fname in filenames:
-                fpath = Path(dirpath) / fname
-                rel = str(fpath.relative_to(root))
+                fpath = os.path.realpath(os.path.join(dirpath, fname))
+                if fpath != root_real and not fpath.startswith(root_prefix):
+                    continue  # escaped root (symlink etc.)
+                rel = os.path.relpath(fpath, root_real)
                 try:
-                    data = fpath.read_bytes()
+                    data = Path(fpath).read_bytes()
                     h = hashlib.sha256(data).hexdigest()
                     files[rel] = FileState(path=rel, size=len(data), sha256=h)
-                except PermissionError:
+                except (PermissionError, OSError):
                     pass
         # content-address: SHA-256[:16] of sorted JSON of file states
         payload = json.dumps({k: v.to_dict() for k, v in sorted(files.items())}, sort_keys=True)
         snap_id = hashlib.sha256(payload.encode()).hexdigest()[:16]
-        return cls(id=snap_id, timestamp=time.time(), root=str(root), files=files)
+        return cls(id=snap_id, timestamp=time.time(), root=root_real, files=files)
 
     def to_dict(self) -> dict[str, object]:
         return {
