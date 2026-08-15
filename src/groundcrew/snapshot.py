@@ -37,42 +37,45 @@ class StateSnapshot:
 
     @classmethod
     def capture(cls, root: str | Path) -> StateSnapshot:
-        """Snapshot every file under *root*.
+        """Snapshot every file under *root* (operator workspace path).
 
-        *root* must stay under the process workspace (cwd) or be an absolute
-        path without ``..`` (local operator workspace scan).
+        Paths must resolve under the process CWD or the system temp dir
+        (pytest). CodeQL: open() only after startswith against those
+        *untainted* roots (cwd / gettempdir), not against user fullpath.
         """
-        # Trusted workspace root (not remote attacker input)
-        base_path = os.path.realpath(os.getcwd())
+        import tempfile
+
+        # Untainted trusted prefixes (CodeQL sources are not these)
+        cwd_root = os.path.realpath(os.getcwd())
+        tmp_root = os.path.realpath(tempfile.gettempdir())
         raw = str(root)
         if chr(0) in raw or ".." in Path(raw).parts:
             raise ValueError("snapshot root must not contain '..' or NUL")
-        # GOOD — normalize then verify against known prefix (CodeQL)
+
         if os.path.isabs(os.path.expanduser(raw)):
             fullpath = os.path.realpath(os.path.normpath(os.path.expanduser(raw)))
-            # absolute operator paths: still require startswith after realpath of parent chain
-            # Restrict to paths under base_path OR under /tmp for tests
-            tmp = os.path.realpath("/tmp")
-            if not (
-                fullpath.startswith(base_path)
-                or fullpath.startswith(tmp + os.sep)
-                or fullpath == tmp
-            ):
-                raise ValueError("snapshot root outside allowed workspace")
         else:
-            fullpath = os.path.normpath(os.path.join(base_path, raw))
-            fullpath = os.path.realpath(fullpath)
-            if not fullpath.startswith(base_path):
-                raise ValueError("not allowed")
+            fullpath = os.path.realpath(os.path.normpath(os.path.join(cwd_root, raw)))
+
+        # GOOD: prefix check against untainted roots before any FS walk
+        if not (
+            fullpath.startswith(cwd_root)
+            or fullpath.startswith(tmp_root + os.sep)
+            or fullpath == tmp_root
+        ):
+            raise ValueError("snapshot root outside allowed workspace")
         if not os.path.isdir(fullpath):
             raise ValueError(f"snapshot root is not a directory: {fullpath}")
-        root_prefix = fullpath if fullpath.endswith(os.sep) else fullpath + os.sep
+
         files: dict[str, FileState] = {}
         for dirpath, _dirnames, filenames in os.walk(fullpath):
             for fname in filenames:
                 candidate = os.path.normpath(os.path.join(dirpath, fname))
-                # GOOD — verify each file path
                 fpath = os.path.realpath(candidate)
+                # GOOD: only open if under untainted cwd or temp root
+                if not (fpath.startswith(cwd_root) or fpath.startswith(tmp_root + os.sep)):
+                    continue
+                # also stay under resolved snapshot root
                 if not fpath.startswith(fullpath):
                     continue
                 rel = os.path.relpath(fpath, fullpath)
