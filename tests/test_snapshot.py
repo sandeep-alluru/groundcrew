@@ -63,14 +63,14 @@ def test_snapshot_round_trip(tmp_path):
 def test_capture_skips_permission_error(tmp_path):
     _write(tmp_path, "a.txt", "hello")
     _write(tmp_path, "b.txt", "world")
-    original = type(tmp_path / "a.txt").read_bytes
+    real_open = open
 
-    def fake_read_bytes(self):
-        if self.name == "b.txt":
+    def fake_open(path, mode="r", *args, **kwargs):
+        if str(path).endswith("b.txt") and "b" in mode:
             raise PermissionError("nope")
-        return original(self)
+        return real_open(path, mode, *args, **kwargs)
 
-    with mock.patch("pathlib.Path.read_bytes", new=fake_read_bytes):
+    with mock.patch("builtins.open", new=fake_open):
         snap = StateSnapshot.capture(tmp_path)
     assert "a.txt" in snap.files
     assert "b.txt" not in snap.files

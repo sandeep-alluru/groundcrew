@@ -37,18 +37,28 @@ class StateSnapshot:
 
     @classmethod
     def capture(cls, root: str | Path) -> StateSnapshot:
-        # Confine walk to realpath(root) — CodeQL py/path-injection
-        root_real = os.path.realpath(os.path.expanduser(str(root)))
+        # Operator-supplied workspace root: normalize, reject "..", walk only that tree.
+        root_s = os.path.expanduser(str(root))
+        if ".." in Path(root_s).parts or chr(0) in root_s:
+            raise ValueError("snapshot root must not contain '..' or NUL")
+        root_real = os.path.realpath(root_s)
+        if not os.path.isdir(root_real):
+            raise ValueError(f"snapshot root is not a directory: {root_real}")
         root_prefix = root_real if root_real.endswith(os.sep) else root_real + os.sep
         files: dict[str, FileState] = {}
-        for dirpath, _, filenames in os.walk(root_real):
+        for dirpath, _dirnames, filenames in os.walk(root_real):
             for fname in filenames:
-                fpath = os.path.realpath(os.path.join(dirpath, fname))
-                if fpath != root_real and not fpath.startswith(root_prefix):
-                    continue  # escaped root (symlink etc.)
-                rel = os.path.relpath(fpath, root_real)
+                # dirpath comes from walk of root_real (not raw user join)
+                candidate = os.path.join(dirpath, fname)
+                f_real = os.path.realpath(candidate)
+                # Positive guard at every file sink (CodeQL)
+                if not (f_real == root_real or f_real.startswith(root_prefix)):
+                    continue
+                rel = os.path.relpath(f_real, root_real)
                 try:
-                    data = Path(fpath).read_bytes()
+                    # open only after positive under-root check
+                    with open(f_real, "rb") as fh:
+                        data = fh.read()
                     h = hashlib.sha256(data).hexdigest()
                     files[rel] = FileState(path=rel, size=len(data), sha256=h)
                 except (PermissionError, OSError):
