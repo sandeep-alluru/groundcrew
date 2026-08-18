@@ -96,9 +96,7 @@ def run_server() -> None:
             _mcp_types.Tool(
                 name="capture_state",
                 description=(
-                    "Capture before/after filesystem state around an action and "
-                    "store a verifiable receipt. Argument is a JSON string with "
-                    "keys: root, verb, target, params, run_cmd."
+                    "Capture a verifiable snapshot of the current agent/environment state and return a receipt id. Use at checkpoints before irreversible actions. Pair with get_receipt to audit later. Does not restore state — it only records."
                 ),
                 inputSchema={
                     "type": "object",
@@ -109,7 +107,7 @@ def run_server() -> None:
             _mcp_types.Tool(
                 name="get_receipt",
                 description=(
-                    "Fetch a stored receipt by ID. Argument is a JSON string with key: receipt_id."
+                    "Fetch a previously captured state receipt by id. Use for audit or to compare against the live environment. Read-only; use capture_state to create receipts."
                 ),
                 inputSchema={
                     "type": "object",
@@ -119,7 +117,9 @@ def run_server() -> None:
             ),
             _mcp_types.Tool(
                 name="list_receipts",
-                description="List all stored receipts. Argument is an (ignored) JSON string.",
+                description=(
+                    "List captured state receipts. Use to browse available checkpoints before calling get_receipt. Read-only."
+                ),
                 inputSchema={
                     "type": "object",
                     "properties": {"arguments": {"type": "string"}},
